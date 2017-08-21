@@ -6,9 +6,9 @@ from os import environ, walk
 from os.path import join, isfile, normpath
 
 import boto3
+from boto3.s3.transfer import TransferConfig
 from botocore.exceptions import ClientError
 from concurrent.futures import ThreadPoolExecutor
-from boto3.s3.transfer import TransferConfig
 
 from scripts.console import Console
 
@@ -192,8 +192,9 @@ def calculate_e_tag(file_path):
         for chunk in iter(lambda: file_stream.read(s3_transfer_config.multipart_chunksize), b""):
             chunk_digests += hashlib.md5(chunk).digest()
             num_chunks += 1
-    md5 = hashlib.md5(chunk_digests).hexdigest()
-    return "{}-{}".format(md5, num_chunks) if num_chunks > 1 else md5
+    if num_chunks > 1:
+        return "{}-{}".format(hashlib.md5(chunk_digests).hexdigest(), num_chunks)
+    return chunk_digests.encode("hex")
 
 
 def find_stale_files_in_s3_bucket(s3_bucket):
@@ -233,7 +234,7 @@ def main():
 
     diff_pairs = find_stale_files_in_s3_bucket(s3_bucket) + find_missing_files_in_s3_bucket(file_paths, s3_bucket)
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor() as executor:
         for s3_key, file_path in diff_pairs:
             if file_path is not None:
                 executor.submit(s3_bucket.put_file, s3_key, file_path)
