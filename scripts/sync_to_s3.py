@@ -23,12 +23,14 @@ class EnvNames(object):
     local_directory = "LOCAL_DIRECTORY"
     s3_bucket_name = "S3_BUCKET_NAME"
 
+
 # Settings.
 AWS_ACCESS_KEY_ID = environ.get(EnvNames.aws_access_key_id)
 AWS_DEFAULT_REGION = environ.get(EnvNames.aws_default_region, "us-east-1")
 AWS_SECRET_ACCESS_KEY = environ.get(EnvNames.aws_secret_access_key)
 LOCAL_DIRECTORY = unicode(environ.get(EnvNames.local_directory))
 S3_BUCKET_NAME = environ.get(EnvNames.s3_bucket_name)
+S3_KEY_BASE = "media"
 
 
 # AWS resources.
@@ -164,8 +166,9 @@ def convert_file_path_to_key(file_path, s3_bucket):
     :return: A S3 key.
     """
     file_path = normpath(file_path.replace(LOCAL_DIRECTORY, "", 1))
+    file_path = file_path[1:] if file_path.startswith(("/", "\\")) else file_path
+    file_path = join(S3_KEY_BASE, file_path)
     file_path = file_path.replace("\\", "/")  # S3 only treats "/" as directory separators.
-    file_path = file_path[1:] if file_path.startswith("/") else file_path
     return s3_bucket.create_key(file_path)
 
 
@@ -175,7 +178,10 @@ def convert_s3_key_to_path(s3_key):
     :param s3_key: S3 key.
     :return: File path to a local file.
     """
-    return normpath(join(LOCAL_DIRECTORY, s3_key.key))
+    key = s3_key.key
+    key = key[len(S3_KEY_BASE):] if key.startswith(S3_KEY_BASE.replace("\\", "/")) else key
+    key = key[1:] if key.startswith("/") else key
+    return normpath(join(LOCAL_DIRECTORY, key))
 
 
 def calculate_e_tag(file_path):
@@ -188,7 +194,7 @@ def calculate_e_tag(file_path):
         return None
     num_chunks = 0
     chunk_digests = b""
-    with open(file_path, "rb") as file_stream:
+    with open(file_path, b"rb") as file_stream:
         for chunk in iter(lambda: file_stream.read(s3_transfer_config.multipart_chunksize), b""):
             chunk_digests += hashlib.md5(chunk).digest()
             num_chunks += 1

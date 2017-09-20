@@ -7,3 +7,6 @@ virtualenv/
 # Compiled Python files.
 *.pyc
 *.pyo
+
+# Development database.
+db.sqlite3
