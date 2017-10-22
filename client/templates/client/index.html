@@ -1,0 +1,16 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    </head>
+    <body>
+        <div id="application"></div>
+        {# External dependencies. #}
+        <script src="https://unpkg.com/react@^16.0.0/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@^16.0.0/umd/react-dom.development.js"></script>
+        {# Main application bundle. #}
+        <script type="text/javascript" src="{% static 'client/js/bundle.js' %}"></script>
+    </body>
+</html>

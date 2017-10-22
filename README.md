@@ -4,7 +4,8 @@ Application for hosting your iTunes library online.
 
 ## Setup
 
-1. Setup environment variables.
+1. Install [Python 2.7](https://www.python.org/downloads/).
+2. Setup environment variables.
     ```
     PYTHONPATH="."
     PYTHONUNBUFFERED=1
@@ -42,6 +43,19 @@ Create database entries for each audio file and playlist in your iTunes library.
 2. Run command.
     ```bash
     python manage.py seed_database "path/to/iTunes/iTunes Music Library.xml"
+    ```
+
+### Build web client
+
+1. Install [Node 6.9](https://nodejs.org/en/download/)
+2. Change current directory to `Muse/client/static/client/js`
+3. Install dependencies.
+    ```bash
+    npm install
+    ```
+4. Build Javascript bundle.
+    ```bash
+    npm build
     ```
 
 ## Management

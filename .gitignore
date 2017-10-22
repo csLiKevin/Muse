@@ -1,12 +1,17 @@
-# IDE settings.
-.idea/
-
-# Virtual environment.
-virtualenv/
-
 # Compiled Python files.
 *.pyc
 *.pyo
 
+# Compiled Javascript files.
+client/static/client/js/bundle.js
+
 # Development database.
 db.sqlite3
+
+# Development packages.
+client/static/client/js/node_modules/
+virtualenv/
+
+# IDE settings.
+.idea/
+
