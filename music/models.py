@@ -14,6 +14,9 @@ class BaseModel(Model):
     class Meta:
         abstract = True
 
+    def __unicode__(self):
+        return self.name
+
 
 class Song(BaseModel):
     file = FileField(upload_to=get_song_media_location)
