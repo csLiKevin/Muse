@@ -1,22 +1,13 @@
-import os
+from os import environ
+from os.path import dirname, abspath, join
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = dirname(dirname(abspath(__file__)))
 
+SECRET_KEY = "development-secret-key"
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "i&-c9xl_*84xeyn4e_kc&k*vg5qj&=py1dc5d^k4ha1qjod73i"
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -25,6 +16,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    "django_cleanup",
 
     "client",
     "music",
@@ -60,20 +53,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "server.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "NAME": join(BASE_DIR, "db.sqlite3"),
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -90,10 +75,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.11/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -104,8 +85,32 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
 STATIC_URL = "/static/"
+
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = "media"
+
+
+# Environment specific settings.
+LOCAL_STAGE = "local"
+STAGE = environ.get("STAGE", LOCAL_STAGE)
+if STAGE != LOCAL_STAGE:
+    SECRET_KEY = environ["DJANGO_SECRET_KEY"]
+    DEBUG = False
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    ALLOWED_HOSTS += environ["DJANGO_ALLOWED_HOSTS"].split(",")
+    INSTALLED_APPS.append("storages")
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "HOST": environ["DJANGO_DATABASE_HOST"],
+        "NAME": environ["DJANGO_DATABASE_NAME"],
+        "PASSWORD": environ["DJANGO_DATABASE_PASSWORD"],
+        "PORT": environ["DJANGO_DATABASE_PORT"],
+        "USER": environ["DJANGO_DATABASE_USER"]
+    }
+    AWS_DEFAULT_ACL = "private"
+    AWS_STORAGE_BUCKET_NAME = environ["DJANGO_AWS_STORAGE_BUCKET_NAME"]
+    STATICFILES_STORAGE = "server.storage_backends.StaticStorage"
+    DEFAULT_FILE_STORAGE = "server.storage_backends.MediaStorage"

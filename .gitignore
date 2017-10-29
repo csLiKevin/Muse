@@ -5,12 +5,18 @@
 # Compiled Javascript files.
 client/static/client/js/bundle.js
 
-# Development database.
+# Local database.
 db.sqlite3
 
+# Local media files.
+media/
+
 # Development packages.
-client/static/client/js/node_modules/
+client/source/node_modules/
 virtualenv/
+
+# Deployment settings.
+zappa_settings.json
 
 # IDE settings.
 .idea/
