@@ -6,4 +6,6 @@ class StaticStorage(S3Boto3Storage):
 
 
 class MediaStorage(S3Boto3Storage):
+    default_acl = "private"
+    bucket_acl = default_acl
     location = "media"

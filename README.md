@@ -64,11 +64,11 @@ Make application public.
     ```bash
     zappa deploy dev
     ```
-7. Update the CORS Configuration for the S3 bucket. Use the API Gateway url from step 6 to replace the `AllowedOrigin` value.
+7. Update the CORS Configuration for the S3 bucket. Use the API Gateway url from step 6 as the `AllowedOrigin` value.
     ```xml
     <CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
         <CORSRule>
-            <AllowedOrigin>*</AllowedOrigin>
+            <AllowedOrigin>https://api.example.com</AllowedOrigin>
             <AllowedMethod>GET</AllowedMethod>
             <MaxAgeSeconds>3000</MaxAgeSeconds>
             <AllowedHeader>Authorization</AllowedHeader>
@@ -80,20 +80,20 @@ Make application public.
     {
        "dev": {
          "aws_environment_variables": {
-           "DJANGO_AWS_STORAGE_BUCKET_NAME": "",
-           "DJANGO_ALLOWED_HOSTS": "",
-           "DJANGO_DATABASE_HOST": "",
-           "DJANGO_DATABASE_NAME": "",
-           "DJANGO_DATABASE_PASSWORD": "",
-           "DJANGO_DATABASE_PORT": "",
-           "DJANGO_DATABASE_USER": "",
-           "DJANGO_SECRET_KEY": "",
+           "DJANGO_AWS_STORAGE_BUCKET_NAME": "s3.example.com",
+           "DJANGO_ALLOWED_HOSTS": "api.example.com",
+           "DJANGO_DATABASE_HOST": "rds.example.com",
+           "DJANGO_DATABASE_NAME": "dbname",
+           "DJANGO_DATABASE_PASSWORD": "dbpassword",
+           "DJANGO_DATABASE_PORT": "5432",
+           "DJANGO_DATABASE_USER": "admin",
+           "DJANGO_SECRET_KEY": "topsecret",
            "STAGE": "public"
          }
        },
        "vpc_config": {
-         "SubnetIds": [],
-         "SecurityGroupIds": []
+         "SubnetIds": ["subnet-1", "subnet-2", "subnet-3"],
+         "SecurityGroupIds": ["sg-1"]
        }
     }
     ```
@@ -112,6 +112,39 @@ Make application public.
 12. Create an admin super user.
     ```bash
     zappa invoke --raw dev "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'password')"
+    ```
+
+### Associate a custom domain
+1. Register a domain name.
+2. Create a hosted zone with Route 53. A nameserver (NS) and start of authority (SOA) record set will be automatically created for you.
+3. Go to your domain registrar and add the list of values in your Route 53 nameserver record set as the Custom DNS nameservers for your domain.
+4. Request a digital certificate from Amazon's Certificate Manager. Add the naked domain as the domain name.
+5. Add the digital certificate's ARN and naked domain to your deploy settings file. Add the naked domain to the list of allowed hosts.
+    ```json
+    {
+       "dev": {
+         "aws_environment_variables": {
+           "DJANGO_ALLOWED_HOSTS": "example.com,api.example.com"
+         },
+         "certificate_arn": "arn:aws:acm:us-east-1:123:certificate/123",
+         "domain": "example.com"
+       }
+    }
+    ```
+6. Add the certificate and domain to the API Gateway.
+    ```bash
+    zappa certify dev
+    ```
+7. Update the S3 bucket's allowed origin to your domain.
+    ```xml
+    <CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+        <CORSRule>
+            <AllowedOrigin>https://example.com</AllowedOrigin>
+            <AllowedMethod>GET</AllowedMethod>
+            <MaxAgeSeconds>3000</MaxAgeSeconds>
+            <AllowedHeader>Authorization</AllowedHeader>
+        </CORSRule>
+    </CORSConfiguration>
     ```
 
 ## Teardown deployment
