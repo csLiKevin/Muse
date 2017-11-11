@@ -75,6 +75,30 @@ Make application public.
         </CORSRule>
     </CORSConfiguration>
     ```
+8. Update the bucket policy for the S3 bucket. Include the API Gateway url from step 6 and bucket url in the referer list.
+    ```json
+    {
+        "Version": "2012-10-17",
+        "Id": "Http referer policy",
+        "Statement": [
+            {
+                "Sid": "Allow get requests from specific referers.",
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::your.bucket.name/*",
+                "Condition": {
+                    "StringLike": {
+                        "aws:Referer": [
+                            "https://api.example.com/*",
+                            "https://s3.amazonaws.com/your.bucket.name/*"
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+    ```
 8. Update the following `zappa` settings.
     ```json
     {
@@ -137,14 +161,16 @@ Make application public.
     ```
 7. Update the S3 bucket's allowed origin to your domain.
     ```xml
-    <CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-        <CORSRule>
-            <AllowedOrigin>https://example.com</AllowedOrigin>
-            <AllowedMethod>GET</AllowedMethod>
-            <MaxAgeSeconds>3000</MaxAgeSeconds>
-            <AllowedHeader>Authorization</AllowedHeader>
-        </CORSRule>
-    </CORSConfiguration>
+    <AllowedOrigin>https://example.com</AllowedOrigin>
+    ```
+8. Update the S3 bucket's bucket policy to include your domain as an accepted HTTP referer.
+    ```json
+    {
+        "aws:Referer": [
+            "https://example.com/*",
+            "https://s3.amazonaws.com/your.bucket.name/*"
+        ]
+    }
     ```
 
 ## Teardown deployment

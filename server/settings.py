@@ -112,6 +112,8 @@ if STAGE != LOCAL_STAGE:
         "PORT": environ["DJANGO_DATABASE_PORT"],
         "USER": environ["DJANGO_DATABASE_USER"]
     }
+    AWS_DEFAULT_ACL = "private"
     AWS_STORAGE_BUCKET_NAME = environ["DJANGO_AWS_STORAGE_BUCKET_NAME"]
+    AWS_QUERYSTRING_AUTH = False
     STATICFILES_STORAGE = "server.storage_backends.StaticStorage"
     DEFAULT_FILE_STORAGE = "server.storage_backends.MediaStorage"
