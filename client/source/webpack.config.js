@@ -12,7 +12,16 @@ module.exports = {
             {
                 loader: "babel-loader",
                 query: {
-                    presets: ["env", "react"]
+                    plugins: [
+                        "transform-decorators-legacy",
+                        "transform-es3-member-expression-literals",
+                        "transform-es3-property-literals"
+                    ],
+                    presets: [
+                        "es2015",
+                        "stage-0",
+                        "react"
+                    ]
                 },
                 test: /\.jsx?$/
             }
@@ -22,5 +31,8 @@ module.exports = {
         path: path.resolve(__dirname, "../static/client/js"),
         filename: "bundle.js",
         publicPath: "/"
+    },
+    resolve: {
+        extensions: [".js", ".jsx"]
     }
 };

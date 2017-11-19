@@ -5,13 +5,25 @@
         <meta charset="UTF-8">
         <title>Muse</title>
         <link rel="shortcut icon" href="{% static "client/img/favicon.ico" %}"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css"/>
+        <style type="text/css">
+            #application {
+                height: 100vh;
+            }
+        </style>
     </head>
     <body>
         <div id="application"></div>
         {# External dependencies. #}
-        <script src="https://unpkg.com/react@^16.0.0/umd/react.development.js"></script>
-        <script src="https://unpkg.com/react-dom@^16.0.0/umd/react-dom.development.js"></script>
+        {% if debug %}
+            <script src="https://unpkg.com/react@^16.0.0/umd/react.development.js"></script>
+            <script src="https://unpkg.com/react-dom@^16.0.0/umd/react-dom.development.js"></script>
+        {% else %}
+            <script src="https://unpkg.com/react@^16.0.0/umd/react.production.min.js"></script>
+            <script src="https://unpkg.com/react-dom@^16.0.0/umd/react-dom.production.min.js"></script>
+        {% endif %}
         {# Main application bundle. #}
-        <script type="text/javascript" src="{% static 'client/js/bundle.js' %}"></script>
+        <script type="text/javascript" src="{% static 'client/js/bundle.js' %}{% if debug %}?{% now "U" %}{% endif %}"></script>
     </body>
 </html>
