@@ -13,7 +13,10 @@
             }
         </style>
     </head>
-    <body>
+    <body
+        data-csrf-token="{{ csrf_token }}"
+        data-graphql-path="{% url "graphql" %}"
+    >
         <div id="application"></div>
         {# External dependencies. #}
         {% if debug %}

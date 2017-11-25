@@ -3,14 +3,14 @@ import React from "react";
 import ReactDOM from "react-dom";
 import {BrowserRouter} from "react-router-dom";
 
-import {Client} from "./components/Client";
+import {Router} from "./components/Router";
 import {store} from "./models/store";
 
 
 ReactDOM.render(
     <Provider {...store}>
         <BrowserRouter>
-            <Client/>
+            <Router/>
         </BrowserRouter>
     </Provider>,
     document.getElementById("application")

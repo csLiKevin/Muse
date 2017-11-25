@@ -1,6 +1,7 @@
 import {action, observable} from "mobx";
 
 import {Song} from "./Song";
+import {GraphqlClient} from "../utils/graphqlClient";
 
 
 export class SongList {
@@ -13,15 +14,21 @@ export class SongList {
     }
 
     @action
+    disableLoading() {
+        this.isLoading = false;
+    }
+
+    @action
     fetchSongs() {
         this.isLoading = true;
         this.songs = [];
-        // TODO: Replace with real code.
-        setTimeout(action(() => {
-            this.addSong({persistentId: 1, name: "first"});
-            this.addSong({persistentId: 2, name: "second"});
-            this.isLoading = false;
-        }), 5000);
+        GraphqlClient.post("{songs{file, name, persistentId}}").then((json) => {
+            const {data: {songs}} = json;
+            songs.forEach((songObject) => {
+                this.addSong(songObject)
+            });
+            this.disableLoading();
+        });
     }
 }
 export default SongList;

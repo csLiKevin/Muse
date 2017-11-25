@@ -1,12 +1,16 @@
-import {CircularProgress, Grid, withStyles} from "material-ui";
+import {CircularProgress, withStyles} from "material-ui";
 import PropTypes from "proptypes";
 import React, {Component} from "react";
 
 
 @withStyles(() => {
     return {
-        container: {
-            height: "100%"
+        root: {
+            alignItems: "center",
+            display: "flex",
+            height: "100%",
+            justifyContent: "center",
+            width: "100%"
         }
     };
 })
@@ -19,16 +23,9 @@ export class LoadingAnimation extends Component {
 
     render() {
         return (
-            <Grid
-                alignItems="center"
-                className={this.props.classes.container}
-                container
-                justify="center"
-            >
-                <Grid item>
-                    <CircularProgress/>
-                </Grid>
-            </Grid>
+            <div className={this.props.classes.root}>
+                <CircularProgress/>
+            </div>
         );
     }
 }

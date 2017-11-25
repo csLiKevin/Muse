@@ -9,6 +9,6 @@ from server.schema import schema
 
 urlpatterns = [
     url(r"^admin/", admin.site.urls),
-    url(r"^graphql", GraphQLView.as_view(graphiql=True, schema=schema)),
+    url(r"^graphql", GraphQLView.as_view(graphiql=True, schema=schema), name="graphql"),
     url(r"^(.*/|)$", TemplateView.as_view(template_name="client/index.html")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
