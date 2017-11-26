@@ -6,7 +6,7 @@ from django.db.models import Model, FileField, CharField, ManyToManyField, Image
 
 
 def replace_illegal_characters(path):
-    illegal_characters = "\/:*?\"<>|"
+    illegal_characters = "\/:*?\"<>|()"
     for char in illegal_characters:
         path = path.replace(char, "-")
     return path

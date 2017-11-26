@@ -58,22 +58,23 @@ export class Application extends Component {
     }
 
     render() {
+        const {classes} = this.props;
         return (
-            <div className={ this.props.classes.root }>
+            <div className={ classes.root }>
                 <AppBar>
                     <Tabs onChange={this.handleChange} value={this.state.value}>
                         <Tab icon={<Home/>} value={PATHS.home.path}/>
                         <Tab icon={<MusicNote/>} value={PATHS.songList.path}/>
                     </Tabs>
                 </AppBar>
-                <div className={ this.props.classes.content}>
+                <div className={classes.content}>
                     <Switch>
                         <Route {...PATHS.home} component={Home}/>
                         <Route {...PATHS.song} component={SongList}/>
                         <Route {...PATHS.songList} component={SongList}/>
                     </Switch>
                 </div>
-                <div className={this.props.classes.player}>
+                <div className={classes.player}>
                     Player
                 </div>
             </div>
