@@ -1,19 +1,31 @@
 from graphene import String, List, Field
 from graphene_django import DjangoObjectType
 
-from music.models import Song, Playlist
+from music.models import Song, Playlist, Album
 
 
-class SongType(DjangoObjectType):
+class AlbumType(DjangoObjectType):
     class Meta:
-        model = Song
-        only_fields = ("file", "name", "persistent_id")
+        model = Album
+        only_fields = ("artist", "image", "name")
+
+    def resolve_image(self, info):
+        return self.image and self.image.url
 
 
 class PlaylistType(DjangoObjectType):
     class Meta:
         model = Playlist
         only_fields = ("name", "persistent_id", "songs")
+
+
+class SongType(DjangoObjectType):
+    class Meta:
+        model = Song
+        only_fields = ("album", "artist", "file", "name", "persistent_id")
+
+    def resolve_file(self, info):
+        return self.file and self.file.url
 
 
 class MusicQuery(object):

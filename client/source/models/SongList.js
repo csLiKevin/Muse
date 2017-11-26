@@ -22,7 +22,7 @@ export class SongList {
     fetchSongs() {
         this.isLoading = true;
         this.songs = [];
-        GraphqlClient.post("{songs{file, name, persistentId}}").then((json) => {
+        GraphqlClient.post("{songs{album{image, name}, artist, file, name, persistentId}}").then((json) => {
             const {data: {songs}} = json;
             songs.forEach((songObject) => {
                 this.addSong(songObject)

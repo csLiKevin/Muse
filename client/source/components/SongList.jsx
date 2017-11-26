@@ -49,12 +49,12 @@ export class SongList extends Component {
                                 <Card className={this.props.classes.card}>
                                     <CardMedia
                                         className={this.props.classes.artwork}
-                                        image="https://via.placeholder.com/175x175"
+                                        image={ song.album.image }
                                         title={ song.name }
                                     />
                                     <CardContent>
                                         <Typography type="headline">{ song.name }</Typography>
-                                        <Typography color="secondary" type="subheading">artist goes here</Typography>
+                                        <Typography color="secondary" type="subheading">{ song.artist }</Typography>
                                     </CardContent>
                                 </Card>
                             </Grid>
