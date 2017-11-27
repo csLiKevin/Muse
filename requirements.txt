@@ -1,5 +1,5 @@
-boto3==1.4.7
-Django==1.11.5
+boto3==1.4.8
+Django==1.11.7
 django-cleanup==1.0.1
 django-storages==1.6.5
 graphene-django==2.0.0

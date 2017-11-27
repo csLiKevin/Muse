@@ -50,4 +50,4 @@ class MusicQuery(object):
             return Song.objects.get(persistent_id=persistent_id)
 
     def resolve_songs(self, info, **kwargs):
-        return Song.objects.all()
+        return Song.objects.select_related("album").all()

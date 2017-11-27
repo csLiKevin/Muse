@@ -1,15 +1,9 @@
 from __future__ import unicode_literals
 
+from hashlib import sha256
 from os.path import splitext
 
 from django.db.models import Model, FileField, CharField, ManyToManyField, ImageField, ForeignKey
-
-
-def replace_illegal_characters(path):
-    illegal_characters = "\/:*?\"<>|()"
-    for char in illegal_characters:
-        path = path.replace(char, "-")
-    return path
 
 
 def get_song_media_location(instance, filename):
@@ -17,9 +11,8 @@ def get_song_media_location(instance, filename):
 
 
 def get_album_media_location(instance, filename):
-    return "album_cover/{}/{}{}".format(
-        replace_illegal_characters(instance.artist),
-        replace_illegal_characters(instance.name),
+    return "album_cover/{}{}".format(
+        sha256("{}{}".format(instance.artist, instance.name).encode("utf-8")).hexdigest(),
         splitext(filename)[1]
     )
 
@@ -50,7 +43,7 @@ class Album(BaseModel):
 
 
 class Song(BaseModel, PersistentModel):
-    album = ForeignKey(Album)
+    album = ForeignKey(Album, related_name="songs")
     artist = CharField(max_length=255)
     file = FileField(upload_to=get_song_media_location)
 

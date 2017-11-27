@@ -69,7 +69,15 @@ export class Player {
 
     @action
     queueSongs(songs) {
-        this.queue.push(...songs);
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        const shuffledSongs = songs.slice();
+        shuffleArray(shuffledSongs);
+        this.queue.push(...shuffledSongs);
     }
 
     @computed
