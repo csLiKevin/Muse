@@ -4,6 +4,8 @@ import PropTypes from "proptypes";
 import React, {Component} from "react";
 import {Route, Switch, withRouter} from "react-router-dom";
 
+import {Home as HomePage} from "./Home";
+import {Player} from "./Player";
 import {SongList} from "./SongList";
 import {PATHS} from "../utils/constants";
 
@@ -17,8 +19,8 @@ import {PATHS} from "../utils/constants";
             marginTop: `${tabHeight}px`
         },
         player: {
-            backgroundColor: "gray",
             bottom: 0,
+            flex: 0,
             height: `${tabHeight}px`,
             position: "fixed",
             width: "100%"
@@ -69,13 +71,13 @@ export class Application extends Component {
                 </AppBar>
                 <div className={classes.content}>
                     <Switch>
-                        <Route {...PATHS.home} component={Home}/>
+                        <Route {...PATHS.home} component={HomePage}/>
                         <Route {...PATHS.song} component={SongList}/>
                         <Route {...PATHS.songList} component={SongList}/>
                     </Switch>
                 </div>
                 <div className={classes.player}>
-                    Player
+                    <Player/>
                 </div>
             </div>
         );

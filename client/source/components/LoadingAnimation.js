@@ -22,9 +22,10 @@ export class LoadingAnimation extends Component {
     }
 
     render() {
+        const {classes, ...otherProps} = this.props;
         return (
-            <div className={this.props.classes.root}>
-                <CircularProgress/>
+            <div className={classes.root}>
+                <CircularProgress {...otherProps}/>
             </div>
         );
     }

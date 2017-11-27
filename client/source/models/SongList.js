@@ -1,4 +1,4 @@
-import {action, observable} from "mobx";
+import {action, computed, observable} from "mobx";
 
 import {Song} from "./Song";
 import {GraphqlClient} from "../utils/graphqlClient";
@@ -22,13 +22,18 @@ export class SongList {
     fetchSongs() {
         this.isLoading = true;
         this.songs = [];
-        GraphqlClient.post("{songs{album{image, name}, artist, file, name, persistentId}}").then((json) => {
+        return GraphqlClient.post("{songs{album{image, name}, artist, file, name, persistentId}}").then((json) => {
             const {data: {songs}} = json;
             songs.forEach((songObject) => {
                 this.addSong(songObject)
             });
             this.disableLoading();
         });
+    }
+
+    @computed
+    get hasSongs() {
+        return Boolean(this.songs.length);
     }
 }
 export default SongList;

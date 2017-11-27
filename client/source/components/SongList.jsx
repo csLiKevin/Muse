@@ -1,5 +1,5 @@
 import {Card, CardContent, CardMedia, IconButton, Grid, Typography, withStyles} from 'material-ui';
-import {Add, PlayArrow} from "material-ui-icons";
+import {AddCircleOutline, PlayCircleOutline} from "material-ui-icons";
 import {inject, observer} from "mobx-react";
 import PropTypes from "proptypes";
 import React, {Component} from "react";
@@ -42,6 +42,7 @@ import {LoadingAnimation} from "./LoadingAnimation";
 })
 @inject((store) => {
     return {
+        player: store.ui.player,
         songList: store.data.songList
     };
 })
@@ -50,12 +51,28 @@ export class SongList extends Component {
     static get propTypes() {
         return {
             classes: PropTypes.object.isRequired,
+            player: PropTypes.object.isRequired,
             songList: PropTypes.object.isRequired
         };
     }
 
     componentWillMount() {
-        this.props.songList.fetchSongs();
+        const {songList} = this.props;
+        if (!songList.hasSongs) {
+            songList.fetchSongs();
+        }
+    }
+
+    createPlaySongHandler(song) {
+        return () => {
+            this.props.player.playSong(song);
+        };
+    }
+
+    createQueueSongHandler(song) {
+        return () => {
+            this.props.player.queueSong(song);
+        };
     }
 
     render() {
@@ -88,11 +105,11 @@ export class SongList extends Component {
                                                 {song.artist}
                                             </Typography>
                                             <div className={classes.controls}>
-                                                <IconButton color="primary">
-                                                    <Add/>
+                                                <IconButton color="primary" onClick={this.createQueueSongHandler(song)}>
+                                                    <AddCircleOutline/>
                                                 </IconButton>
-                                                <IconButton color="primary">
-                                                    <PlayArrow/>
+                                                <IconButton color="primary" onClick={this.createPlaySongHandler(song)}>
+                                                    <PlayCircleOutline/>
                                                 </IconButton>
                                             </div>
                                         </CardContent>
