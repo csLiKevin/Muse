@@ -15,6 +15,7 @@
     </head>
     <body
         data-csrf-token="{{ csrf_token }}"
+        data-filler-pixel-path="{% static "client/img/pixel.png" %}"
         data-graphql-path="{% url "graphql" %}"
     >
         <div id="application"></div>

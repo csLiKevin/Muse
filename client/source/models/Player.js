@@ -28,7 +28,7 @@ export class Player {
     @action
     playPreviousSong() {
         if (this._current) {
-            this.queue.push(this._current);
+            this.queue.unshift(this._current);
         }
         this._current = this.history.pop();
         this.playSong();
@@ -38,10 +38,9 @@ export class Player {
     playSong(song) {
         if (song) {
             // To play a specific song place the current song on top of the queue.
-            if (this._current) {
-                this.queue.unshift(this._current);
-            }
-            this._current = song;
+            this.history.push(song);
+            this.playPreviousSong();
+            return;
         } else if (!this._current) {
             this._current = this.queue.shift();
         }
@@ -100,3 +99,4 @@ export class Player {
         return Boolean(this.queue.length);
     }
 }
+export default Player;

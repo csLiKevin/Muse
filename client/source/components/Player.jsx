@@ -74,6 +74,7 @@ export class Player extends Component {
         this.handlePause = this.handlePause.bind(this);
         this.handlePlay = this.handlePlay.bind(this);
         this.handlePrevious = this.handlePrevious.bind(this);
+        this.fillerPixelPath = document.body.dataset.fillerPixelPath;
     }
 
     handleNext() {
@@ -85,14 +86,7 @@ export class Player extends Component {
     }
 
     handlePlay() {
-        const {player, songList} = this.props;
-        if (!songList.hasSongs) {
-            songList.fetchSongs().then(() => {
-                player.playSong();
-            });
-        } else {
-            player.playSong();
-        }
+        this.props.player.playSong();
     }
 
     handlePrevious() {
@@ -103,7 +97,7 @@ export class Player extends Component {
         const {classes, player, songList} = this.props;
         let centerIcon = <PlayCircleOutline/>;
         let centerOnClick = this.handlePlay;
-        if (songList.isLoading) {
+        if (player.audio.isLoading) {
             centerIcon = <LoadingAnimation color="inherit" size={24}/>;
             centerOnClick = null;
         }
@@ -116,7 +110,7 @@ export class Player extends Component {
                 <div className={classes.controlsLeft}>
                     <CardMedia
                         className={classes.albumCover}
-                        image={player.currentSong.album.image}
+                        image={player.currentSong.album.image || this.fillerPixelPath}
                         title={player.currentSong.name}
                     />
                     <Typography className={classes.title} type="body2">
@@ -127,7 +121,7 @@ export class Player extends Component {
                     <IconButton disabled={!player.hasHistory} onClick={this.handlePrevious}>
                         <SkipPrevious/>
                     </IconButton>
-                    <IconButton onClick={centerOnClick}>
+                    <IconButton disabled={!player.hasQueue} onClick={centerOnClick}>
                         {centerIcon}
                     </IconButton>
                     <IconButton disabled={!player.hasQueue} onClick={this.handleNext}>
@@ -140,7 +134,7 @@ export class Player extends Component {
                         <PlaylistAdd/>
                     </IconButton>
                     <Typography className={classes.duration} type="body2">
-                        {player.audio.currentTime} / {player.audio.duration}
+                        {player.audio.formattedCurrentTime} / {player.audio.formattedDuration}
                     </Typography>
                 </div>
             </Paper>

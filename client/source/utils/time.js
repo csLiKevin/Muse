@@ -1,4 +1,7 @@
 export function formatTime(time) {
+    if (isNaN(time)) {
+        return "--:--";
+    }
     time = Math.trunc(time);
     const minutes = Math.floor(time / 60);
     const seconds = time - minutes * 60;
