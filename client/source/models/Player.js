@@ -1,11 +1,12 @@
 import {action, computed, observable} from "mobx";
 
 import {AudioWrapper} from "./AudioWrapper";
+import {Song} from "./Song";
 
 
 export class Player {
-    @observable _current;
     @observable audio = new AudioWrapper();
+    @observable current = new Song();
     @observable history = [];
     @observable isPlaying = false;
     @observable queue = [];
@@ -18,19 +19,19 @@ export class Player {
 
     @action
     playNextSong() {
-        if (this._current) {
-            this.history.push(this._current);
+        if (this.current.playable) {
+            this.history.push(this.current);
         }
-        this._current = this.queue.shift();
+        this.current = this.queue.shift();
         this.playSong();
     }
 
     @action
     playPreviousSong() {
-        if (this._current) {
-            this.queue.unshift(this._current);
+        if (this.current.playable) {
+            this.queue.unshift(this.current);
         }
-        this._current = this.history.pop();
+        this.current = this.history.pop();
         this.playSong();
     }
 
@@ -41,14 +42,14 @@ export class Player {
             this.history.push(song);
             this.playPreviousSong();
             return;
-        } else if (!this._current) {
-            this._current = this.queue.shift();
+        } else if (!this.current.playable) {
+            this.current = this.queue.shift();
         }
-        if (this._current) {
-            // A new audio object should not be created if the audio source has not changed.
-            if (this.audio.src !== this._current.file) {
+        if (this.current.playable) {
+            // A new audio object should be created if the audio source has changed.
+            if (this.audio.src !== this.current.file) {
                 this.audio.pause();
-                this.audio = new AudioWrapper(this._current.file);
+                this.audio = new AudioWrapper(this.current.file);
                 this.audio.addEventListener("ended", () => {
                     this.playNextSong();
                 });
@@ -77,16 +78,6 @@ export class Player {
         const shuffledSongs = songs.slice();
         shuffleArray(shuffledSongs);
         this.queue.push(...shuffledSongs);
-    }
-
-    @computed
-    get currentSong() {
-        if (!this._current) {
-            return {
-                album: {}
-            };
-        }
-        return this._current;
     }
 
     @computed

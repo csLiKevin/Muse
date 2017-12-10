@@ -12,3 +12,5 @@ export const PATHS = {
         path: "/songs/"
     }
 };
+
+export const PAGE_SIZE = 48;

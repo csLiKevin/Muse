@@ -2,9 +2,11 @@ import {Card, CardContent, CardMedia, IconButton, Grid, Typography, withStyles} 
 import {AddCircleOutline, PlayCircleOutline} from "material-ui-icons";
 import {inject, observer} from "mobx-react";
 import PropTypes from "proptypes";
+import queryString from "query-string";
 import React, {Component} from "react";
 
 import {LoadingAnimation} from "./LoadingAnimation";
+import {Pagination} from "./Pagination";
 
 
 @withStyles((theme) => {
@@ -32,6 +34,9 @@ import {LoadingAnimation} from "./LoadingAnimation";
             overflowX: "hidden",
             textOverflow: "ellipsis"
         },
+        pagination: {
+            textAlign: "center"
+        },
         root: {
             paddingBottom: `${spacingUnit}px`,
             paddingLeft: `${spacingUnit}px`,
@@ -51,15 +56,18 @@ export class SongList extends Component {
     static get propTypes() {
         return {
             classes: PropTypes.object.isRequired,
+            location: PropTypes.object.isRequired,
             player: PropTypes.object.isRequired,
             songList: PropTypes.object.isRequired
         };
     }
 
     componentWillMount() {
-        const {songList} = this.props;
+        const {location, songList} = this.props;
+        const parameters = queryString.parse(location.search);
+        const page = parameters.page || 1;
         if (!songList.hasSongs) {
-            songList.fetchSongs();
+            songList.fetchSongs(page);
         }
     }
 
@@ -118,6 +126,13 @@ export class SongList extends Component {
                             );
                         })
                     }
+                    <Grid className={classes.pagination} item xs={12}>
+                        <Pagination
+                            changePageCallback={songList.fetchSongs.bind(songList)}
+                            currentPage={songList.page}
+                            numPages={songList.numPages}
+                        />
+                    </Grid>
                 </Grid>
             </div>
         );

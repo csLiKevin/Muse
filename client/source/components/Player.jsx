@@ -110,18 +110,18 @@ export class Player extends Component {
                 <div className={classes.controlsLeft}>
                     <CardMedia
                         className={classes.albumCover}
-                        image={player.currentSong.album.image || this.fillerPixelPath}
-                        title={player.currentSong.name}
+                        image={player.current.album.image || this.fillerPixelPath}
+                        title={player.current.name}
                     />
                     <Typography className={classes.title} type="body2">
-                        {player.currentSong.name}
+                        {player.current.name}
                     </Typography>
                 </div>
                 <div className={classes.controls}>
                     <IconButton disabled={!player.hasHistory} onClick={this.handlePrevious}>
                         <SkipPrevious/>
                     </IconButton>
-                    <IconButton disabled={!player.hasQueue} onClick={centerOnClick}>
+                    <IconButton disabled={!player.hasQueue && !player.current.playable} onClick={centerOnClick}>
                         {centerIcon}
                     </IconButton>
                     <IconButton disabled={!player.hasQueue} onClick={this.handleNext}>
