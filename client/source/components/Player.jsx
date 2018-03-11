@@ -1,5 +1,5 @@
-import {CardMedia, colors, IconButton, Paper, Typography, withStyles} from 'material-ui';
-import {PauseCircleOutline, PlaylistAdd, PlayCircleOutline, SkipNext, SkipPrevious} from "material-ui-icons";
+import {Card, CardContent, CardMedia, IconButton, Typography, withStyles} from 'material-ui';
+import {PlayCircleOutline, PauseCircleOutline, SkipNext, SkipPrevious} from "material-ui-icons";
 import {inject, observer} from "mobx-react";
 import PropTypes from "proptypes";
 import React, {Component} from "react";
@@ -7,137 +7,101 @@ import React, {Component} from "react";
 import {LoadingAnimation} from "./LoadingAnimation";
 
 
-@withStyles((theme) => {
+@withStyles(theme => {
     const spacingUnit = theme.spacing.unit;
     return {
-        albumCover: {
-            flex: "0 0 auto",
-            marginBottom: `-${spacingUnit}px`,
-            marginLeft: `-${2 * spacingUnit}px`,
-            marginRight: `${2 * spacingUnit}px`,
-            marginTop: `-${spacingUnit}px`,
-            width: "40px"
-        },
         controls: {
-            flex: "0 0 auto"
-        },
-        controlsLeft: {
-            display: "flex",
-            flex: 1
-        },
-        controlsRight: {
             alignItems: "center",
-            display: "flex",
-            flex: 1
+            display: "flex"
+        },
+        cover: {
+            width: `${12 * spacingUnit}px`
         },
         duration: {
-            flex: "0 0 auto"
+            alignItems: "center",
+            display: "flex",
+            flex: 1,
+            justifyContent: "flex-end",
+            marginLeft: `${2 * spacingUnit}px`,
+            marginRight: `${2 * spacingUnit}px`
         },
-        placeholder: {
-            flex: 1
-        },
-        player: {
-            display: "none"
+        information: {
+            flex: 1,
+            minHeight: "44px"
         },
         root: {
-            alignItems: "center",
-            backgroundColor: colors.grey[200],
-            display: "flex",
-            justifyContent: "center",
-            paddingLeft: `${3 * spacingUnit}px`,
-            paddingRight: `${3 * spacingUnit}px`
-        },
-        title: {
-            flex: 1
+            display: "flex"
         }
     };
 })
-@inject((store) => {
-    return {
-        player: store.ui.player,
-        songList: store.data.songList
-    };
-})
+@inject(({player}) => ({player}))
 @observer
 export class Player extends Component {
     static get propTypes() {
         return {
             classes: PropTypes.object.isRequired,
-            player: PropTypes.object.isRequired,
-            songList: PropTypes.object.isRequired
+            player: PropTypes.object.isRequired
         };
     }
 
     constructor(props, context) {
         super(props, context);
-        this.handleNext = this.handleNext.bind(this);
-        this.handlePause = this.handlePause.bind(this);
-        this.handlePlay = this.handlePlay.bind(this);
-        this.handlePrevious = this.handlePrevious.bind(this);
         this.fillerPixelPath = document.body.dataset.fillerPixelPath;
+        this.handlePlayPrevious = this.handlePlayPrevious.bind(this);
+        this.handlePlayNext = this.handlePlayNext.bind(this);
     }
 
-    handleNext() {
-        this.props.player.playNextSong();
-    }
-
-    handlePause() {
-        this.props.player.pauseSong();
-    }
-
-    handlePlay() {
-        this.props.player.playSong();
-    }
-
-    handlePrevious() {
+    handlePlayPrevious() {
         this.props.player.playPreviousSong();
     }
 
+    handlePlayNext() {
+        this.props.player.playNextSong();
+    }
+
     render() {
-        const {classes, player, songList} = this.props;
-        let centerIcon = <PlayCircleOutline/>;
-        let centerOnClick = this.handlePlay;
-        if (player.audio.isLoading) {
-            centerIcon = <LoadingAnimation color="inherit" size={24}/>;
-            centerOnClick = null;
+        const {classes, player} = this.props;
+        const {currentSong, hasHistory, hasQueue, pauseSong, playSong} = player;
+
+        let centerControlIcon = <PlayCircleOutline/>;
+        let centerControlOnClick = playSong.bind(player);
+        if (currentSong.audioStatus.loading) {
+            centerControlIcon = <LoadingAnimation color="inherit" size={24}/>;
+            centerControlOnClick = null;
         }
-        else if (player.isPlaying) {
-            centerIcon = <PauseCircleOutline/>;
-            centerOnClick = this.handlePause;
+        else if (currentSong.audioStatus.playing) {
+            centerControlIcon = <PauseCircleOutline/>;
+            centerControlOnClick = pauseSong.bind(player);
         }
+
         return (
-            <Paper className={classes.root}>
-                <div className={classes.controlsLeft}>
-                    <CardMedia
-                        className={classes.albumCover}
-                        image={player.current.album.image || this.fillerPixelPath}
-                        title={player.current.name}
-                    />
-                    <Typography className={classes.title} type="body2">
-                        {player.current.name}
-                    </Typography>
-                </div>
+            <Card className={classes.root}>
+                <CardMedia
+                    className={classes.cover}
+                    image={currentSong.album.image || this.fillerPixelPath}
+                    title={currentSong.name}
+                />
+                <CardContent className={classes.information}>
+                    <Typography variant="body2">{currentSong.name}</Typography>
+                    <Typography color="textSecondary">{currentSong.artist}</Typography>
+                </CardContent>
                 <div className={classes.controls}>
-                    <IconButton disabled={!player.hasHistory} onClick={this.handlePrevious}>
+                    <IconButton disabled={!hasHistory} onClick={ this.handlePlayPrevious }>
                         <SkipPrevious/>
                     </IconButton>
-                    <IconButton disabled={!player.hasQueue && !player.current.playable} onClick={centerOnClick}>
-                        {centerIcon}
+                    <IconButton disabled={!currentSong.file && !hasQueue} onClick={ centerControlOnClick }>
+                        {centerControlIcon}
                     </IconButton>
-                    <IconButton disabled={!player.hasQueue} onClick={this.handleNext}>
+                    <IconButton disabled={!hasQueue} onClick={ this.handlePlayNext }>
                         <SkipNext/>
                     </IconButton>
                 </div>
-                <div className={classes.controlsRight}>
-                    {/* TODO: Remove this button. */}
-                    <IconButton className={classes.placeholder} onClick={() => player.queueSongs(songList.songs)}>
-                        <PlaylistAdd/>
-                    </IconButton>
-                    <Typography className={classes.duration} type="body2">
-                        {player.audio.formattedCurrentTime} / {player.audio.formattedDuration}
+                <div className={classes.duration}>
+                    <Typography variant="body2">
+                        {currentSong.audioStatus.currentTime} / {currentSong.audioStatus.duration}
                     </Typography>
                 </div>
-            </Paper>
+            </Card>
         );
     }
 }

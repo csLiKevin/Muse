@@ -8,22 +8,23 @@ module.exports = {
        "react-dom": "ReactDOM"
     },
     module: {
-        loaders: [
+        rules: [
             {
-                loader: "babel-loader",
-                query: {
-                    plugins: [
-                        "transform-decorators-legacy",
-                        "transform-es3-member-expression-literals",
-                        "transform-es3-property-literals"
-                    ],
-                    presets: [
-                        "es2015",
-                        "stage-0",
-                        "react"
-                    ]
-                },
-                test: /\.jsx?$/
+                test: /\.jsx?$/,
+                use: [
+                    {
+                        loader: "babel-loader",
+                        options: {
+                            plugins: [
+                                "transform-decorators-legacy"
+                            ],
+                            presets: [
+                                "stage-0",
+                                "react"
+                            ]
+                        }
+                    }
+                ]
             }
         ]
     },

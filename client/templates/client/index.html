@@ -13,11 +13,7 @@
             }
         </style>
     </head>
-    <body
-        data-csrf-token="{{ csrf_token }}"
-        data-filler-pixel-path="{% static "client/img/pixel.png" %}"
-        data-graphql-path="{% url "graphql" %}"
-    >
+    <body data-filler-pixel-path="{% static "client/img/pixel.png" %}">
         <div id="application"></div>
         {# External dependencies. #}
         {% if debug %}

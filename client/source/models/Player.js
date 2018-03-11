@@ -1,64 +1,93 @@
 import {action, computed, observable} from "mobx";
-
-import {AudioWrapper} from "./AudioWrapper";
-import {Song} from "./Song";
+import {formatTime} from "../utils/functions";
 
 
 export class Player {
-    @observable audio = new AudioWrapper();
-    @observable current = new Song();
-    @observable history = [];
-    @observable isPlaying = false;
-    @observable queue = [];
+    @observable _currentSong;
+    @observable _audioStatus;
+    @observable history;
+    @observable queue;
+
+    constructor() {
+        this._audioStatus = {
+            currentTime: formatTime(undefined),
+            duration: formatTime(undefined),
+            loading: false,
+            playing: false
+        };
+        this._currentSong = undefined;
+        this.audio = new Audio();
+        this.history = [];
+        this.loading = false;
+        this.queue = [];
+
+        this.audio.addEventListener("canplay", action(() => {
+            this._audioStatus.loading = false;
+        }));
+        this.audio.addEventListener("durationchange", action(() => {
+            this._audioStatus.duration = formatTime(this.audio.duration);
+        }));
+        this.audio.addEventListener("ended", () => {
+            this.playNextSong();
+        });
+        this.audio.addEventListener("pause", action(() => {
+            this._audioStatus.playing = false;
+        }));
+        this.audio.addEventListener("play", action(() => {
+            this._audioStatus.playing = true;
+        }));
+        this.audio.addEventListener("loadstart", action(() => {
+            this._audioStatus.loading = true;
+        }));
+        this.audio.addEventListener("timeupdate", action(() => {
+            this._audioStatus.currentTime = formatTime(this.audio.currentTime);
+        }));
+    }
 
     @action
+    clearQueue() {
+        this.queue = [];
+    }
+
     pauseSong() {
         this.audio.pause();
-        this.isPlaying = false;
     }
 
     @action
     playNextSong() {
-        if (this.current.playable) {
-            this.history.push(this.current);
+        if (this._currentSong) {
+            this.history.push(this._currentSong);
         }
-        this.current = this.queue.shift();
-        this.playSong();
+
+        if (this.hasQueue) {
+            this._currentSong = this.queue.shift();
+            this.audio.src = this._currentSong.file;
+            this.playSong();
+        } else {
+            this._currentSong = undefined;
+        }
     }
 
     @action
     playPreviousSong() {
-        if (this.current.playable) {
-            this.queue.unshift(this.current);
+        if (this._currentSong) {
+            this.queue.unshift(this._currentSong)
         }
-        this.current = this.history.pop();
-        this.playSong();
+
+        if (this.hasHistory) {
+            this._currentSong = this.history.pop();
+            this.audio.src = this._currentSong.file;
+            this.playSong();
+        } else {
+            this._currentSong = undefined;
+        }
     }
 
-    @action
-    playSong(song) {
-        if (song) {
-            // To play a specific song place the current song on top of the queue.
-            this.history.push(song);
-            this.playPreviousSong();
-            return;
-        } else if (!this.current.playable) {
-            this.current = this.queue.shift();
-        }
-        if (this.current.playable) {
-            // A new audio object should be created if the audio source has changed.
-            if (this.audio.src !== this.current.file) {
-                this.audio.pause();
-                this.audio = new AudioWrapper(this.current.file);
-                this.audio.addEventListener("ended", () => {
-                    this.playNextSong();
-                });
-            }
+    playSong() {
+        if (this._currentSong) {
             this.audio.play();
-            this.isPlaying = true;
         } else {
-            // Pause the player if there is no song to play.
-            this.pauseSong();
+            this.playNextSong();
         }
     }
 
@@ -69,15 +98,14 @@ export class Player {
 
     @action
     queueSongs(songs) {
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                let j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-        const shuffledSongs = songs.slice();
-        shuffleArray(shuffledSongs);
-        this.queue.push(...shuffledSongs);
+        this.queue.push(...songs);
+    }
+
+    @computed
+    get currentSong() {
+        return this._currentSong
+            ? {...this._currentSong, audioStatus: this._audioStatus}
+            : { album: {}, audioStatus: this._audioStatus };
     }
 
     @computed

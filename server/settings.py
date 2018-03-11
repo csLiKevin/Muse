@@ -7,9 +7,9 @@ SECRET_KEY = "development-secret-key"
 
 DEBUG = True
 
-INTERNAL_IPS = [
-    "127.0.0.1"
-]
+# INTERNAL_IPS = [
+#     "127.0.0.1"
+# ]
 
 ALLOWED_HOSTS = []
 
@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "django_cleanup",
-    "graphene_django",
+    "rest_framework",
 
     "client",
     "music",
@@ -51,7 +51,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "django.template.context_processors.media"
+                # "django.template.context_processors.media"
             ],
         },
     },

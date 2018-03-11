@@ -1,22 +1,13 @@
-import {observable, useStrict} from "mobx";
+import {useStrict} from "mobx";
 
 import {Player} from "./Player";
-import {SongList} from "./SongList";
+import {Songs} from "./Songs";
 
 
 useStrict(true);
 
 export const store = {
-    data: {
-        songList: new SongList()
-    },
-    ui: {
-        player: new Player()
-    }
+    player: new Player(),
+    songs: new Songs()
 };
 export default store;
-
-if (process.env.NODE_ENV !== "production") {
-    // Allow console access to the store during development.
-    window.store = store;
-}

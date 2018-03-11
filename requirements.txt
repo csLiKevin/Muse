@@ -1,9 +1,9 @@
-boto3==1.5.22
-Django==1.11.10
+boto3==1.6.6
+Django==2.0.3
 django-cleanup==2.1.0
+djangorestframework==3.7.7
 django-storages==1.6.5
-graphene-django==2.0.0
 mutagen==1.40.0
 Pillow==5.0.0
-psycopg2==2.7.3.2
+psycopg2==2.7.4
 zappa==0.45.1

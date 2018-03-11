@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from hashlib import sha256
 from os.path import splitext
 
-from django.db.models import Model, FileField, CharField, ManyToManyField, ImageField, ForeignKey
+from django.db.models import Model, FileField, CharField, ManyToManyField, ImageField, ForeignKey, CASCADE
 
 
 def get_song_media_location(instance, filename):
@@ -43,7 +43,7 @@ class Album(BaseModel):
 
 
 class Song(BaseModel, PersistentModel):
-    album = ForeignKey(Album, related_name="songs")
+    album = ForeignKey(Album, CASCADE, related_name="songs")
     artist = CharField(max_length=255)
     file = FileField(upload_to=get_song_media_location)
 
