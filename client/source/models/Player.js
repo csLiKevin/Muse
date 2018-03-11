@@ -1,5 +1,4 @@
 import {action, computed, observable} from "mobx";
-import {formatTime} from "../utils/functions";
 
 
 export class Player {
@@ -10,8 +9,8 @@ export class Player {
 
     constructor() {
         this._audioStatus = {
-            currentTime: formatTime(undefined),
-            duration: formatTime(undefined),
+            currentTime: undefined,
+            duration: undefined,
             loading: false,
             playing: false
         };
@@ -25,7 +24,7 @@ export class Player {
             this._audioStatus.loading = false;
         }));
         this.audio.addEventListener("durationchange", action(() => {
-            this._audioStatus.duration = formatTime(this.audio.duration);
+            this._audioStatus.duration = this.audio.duration;
         }));
         this.audio.addEventListener("ended", () => {
             this.playNextSong();
@@ -33,15 +32,23 @@ export class Player {
         this.audio.addEventListener("pause", action(() => {
             this._audioStatus.playing = false;
         }));
-        this.audio.addEventListener("play", action(() => {
+        this.audio.addEventListener("playing", action(() => {
             this._audioStatus.playing = true;
         }));
         this.audio.addEventListener("loadstart", action(() => {
             this._audioStatus.loading = true;
         }));
         this.audio.addEventListener("timeupdate", action(() => {
-            this._audioStatus.currentTime = formatTime(this.audio.currentTime);
+            this._audioStatus.currentTime = this.audio.currentTime;
         }));
+
+        this.audio.addEventListener("error", () => {
+            console.log("*** ERROR ***");
+            console.log(this.audio.error);
+            console.log(this.audio.src);
+            console.log(this.audio.currentTime);
+            console.log(this.audio.duration);
+        });
     }
 
     @action
