@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from hashlib import sha256
 from os.path import splitext
 
@@ -23,7 +21,7 @@ class BaseModel(Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 

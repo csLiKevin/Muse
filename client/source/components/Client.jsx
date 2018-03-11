@@ -4,6 +4,8 @@ import React, {Component} from "react";
 
 import {LoadingAnimation} from "./LoadingAnimation";
 import {Player} from "./Player";
+import {History} from "./History";
+import {Queue} from "./Queue";
 import {shuffleArray} from "../utils/functions";
 
 
@@ -31,6 +33,10 @@ export class Client extends Component {
                             : <LoadingAnimation color="inherit" size={24}/>
                     }
                 </Button>
+                <div style={{display: "flex"}}>
+                    <div style={{flex: 1}}><History /></div>
+                    <div style={{flex: 1}}><Queue/></div>
+                </div>
             </div>
         );
     }

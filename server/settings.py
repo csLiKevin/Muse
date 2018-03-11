@@ -7,10 +7,6 @@ SECRET_KEY = "development-secret-key"
 
 DEBUG = True
 
-# INTERNAL_IPS = [
-#     "127.0.0.1"
-# ]
-
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -97,6 +93,9 @@ MEDIA_URL = "/media/"
 
 MEDIA_ROOT = "media"
 
+INTERNAL_IPS = [
+    "127.0.0.1"
+]
 
 # Environment specific settings.
 LOCAL_STAGE = "local"

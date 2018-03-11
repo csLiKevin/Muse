@@ -7,6 +7,6 @@ export class ApiClient {
     }
 
     static getSongs({page=1, pageSize=24}) {
-        return ApiClient.get('/api/songs', { page, page_size: pageSize });
+        return ApiClient.get('/api/songs/', { page, page_size: pageSize });
     }
 }
