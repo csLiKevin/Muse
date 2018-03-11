@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
-
 from io import BytesIO
 from os.path import isfile
-from plistlib import readPlist
-from urlparse import unquote
+from plistlib import load
+from urllib.parse import unquote
 
 from PIL import Image
 from django.core.files import File
@@ -38,18 +36,19 @@ class Command(BaseCommand):
     help = "Seed database with an iTunes library XML file."
 
     def add_arguments(self, parser):
-        parser.add_argument("itunes_library", type=unicode)
+        parser.add_argument("itunes_library", type=str)
 
     def handle(self, itunes_library, *args, **options):
         if not isfile(itunes_library):
             self.stderr.write("{} is not a file.".format(itunes_library))
         else:
             call_command("migrate")
-            itunes_library = readPlist(itunes_library)
+            with open(itunes_library, "rb") as itunes_library_stream:
+                itunes_library = load(itunes_library_stream)
             tracks = {}
-            for track in itunes_library["Tracks"].itervalues():
+            for track in itunes_library["Tracks"].values():
                 if track["Kind"] in ["MPEG audio file", "Purchased AAC audio file", "AAC audio file"]:
-                    location = unquote(track["Location"]).decode("utf8").replace("file://localhost/", "")
+                    location = unquote(track["Location"]).replace("file://localhost/", "")
 
                     album = track["Album"]
                     album_artist = track["Album Artist"]
