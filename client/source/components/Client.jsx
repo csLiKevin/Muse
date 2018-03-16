@@ -1,42 +1,35 @@
-import {Button} from "material-ui";
-import {inject, observer} from "mobx-react";
+import {withStyles} from "material-ui";
+import PropTypes from "proptypes";
 import React, {Component} from "react";
+import {Route, Switch} from "react-router-dom"
 
-import {LoadingAnimation} from "./LoadingAnimation";
+import {PageNotFound} from "./PageNotFound";
 import {Player} from "./Player";
-import {History} from "./History";
-import {Queue} from "./Queue";
-import {shuffleArray} from "../utils/functions";
+import {PlayerPage} from "./PlayerPage";
+import {HomePage} from "./HomePage";
 
 
-@inject(({player, songs}) => ({player, songs}))
-@observer
+@withStyles(() => ({
+    root: {
+        height: "100%"
+    }
+}))
 export class Client extends Component {
+    static get propTypes() {
+        return {
+            classes: PropTypes.object.isRequired
+        };
+    }
+
     render() {
         return (
-            <div>
+            <div className={this.props.classes.root}>
                 <Player />
-                <Button
-                    color="primary"
-                    onClick={() => {
-                        this.props.player.clearQueue();
-                        this.props.songs.getAllSongs().then((songs) => {
-                            shuffleArray(songs);
-                            this.props.player.queueSongs(songs);
-                        });
-                    }}
-                    variant="raised"
-                >
-                    {
-                        !this.props.songs.loading
-                            ? "Queue All Songs"
-                            : <LoadingAnimation color="inherit" size={24}/>
-                    }
-                </Button>
-                <div style={{display: "flex"}}>
-                    <div style={{flex: 1}}><History /></div>
-                    <div style={{flex: 1}}><Queue/></div>
-                </div>
+                <Switch>
+                    <Route exact path="/" component={HomePage}/>
+                    <Route exact path="/player/" component={PlayerPage}/>
+                    <Route component={PageNotFound}/>
+                </Switch>
             </div>
         );
     }

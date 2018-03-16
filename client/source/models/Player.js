@@ -9,8 +9,8 @@ export class Player {
 
     constructor() {
         this._audioStatus = {
-            currentTime: undefined,
-            duration: undefined,
+            currentTime: NaN,
+            duration: NaN,
             loading: false,
             playing: false
         };
