@@ -42,13 +42,12 @@ export class Player {
             this._audioStatus.currentTime = this.audio.currentTime;
         }));
 
-        this.audio.addEventListener("error", () => {
-            console.log("*** ERROR ***");
-            console.log(this.audio.error);
-            console.log(this.audio.src);
-            console.log(this.audio.currentTime);
-            console.log(this.audio.duration);
-        });
+        this.audio.addEventListener("error", action(() => {
+            // TODO: Temporary fix for "PIPELINE_ERROR_DECODE: Failed to send audio packet for decoding".
+            const { currentTime, duration, src, error } = this.audio;
+            console.log("*** ERROR ***", {currentTime, duration, src, error});
+            this.playNextSong();
+        }));
     }
 
     @action
