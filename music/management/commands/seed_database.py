@@ -41,59 +41,61 @@ class Command(BaseCommand):
     def handle(self, itunes_library, *args, **options):
         if not isfile(itunes_library):
             self.stderr.write("{} is not a file.".format(itunes_library))
-        else:
-            call_command("migrate")
-            with open(itunes_library, "rb") as itunes_library_stream:
-                itunes_library = load(itunes_library_stream)
-            tracks = {}
-            for track in itunes_library["Tracks"].values():
-                if track["Kind"] in ["MPEG audio file", "Purchased AAC audio file", "AAC audio file"]:
-                    location = unquote(track["Location"]).replace("file://localhost/", "")
+            return
 
-                    album = track["Album"]
-                    album_artist = track["Album Artist"]
-                    artist = track["Artist"]
-                    name = track["Name"]
-                    persistent_id = track["Persistent ID"]
-                    track_id = track["Track ID"]
+        call_command("migrate")
+        with open(itunes_library, "rb") as itunes_library_stream:
+            itunes_library = load(itunes_library_stream)
 
-                    album, album_created = Album.objects.get_or_create(artist=album_artist, name=album)
-                    song, song_created = Song.objects.get_or_create(
-                        album=album,
-                        artist=artist,
-                        name=name,
-                        persistent_id=persistent_id
-                    )
-                    tracks[track_id] = song
+        tracks = {}
+        for track in itunes_library["Tracks"].values():
+            if track["Kind"] in ["MPEG audio file", "Purchased AAC audio file", "AAC audio file"]:
+                location = unquote(track["Location"]).replace("file://localhost/", "")
 
-                    if album_created or song_created:
-                        with open(location, "rb") as file_stream:
-                            if album_created:
-                                with NamedTemporaryFile() as temp:
-                                    try:
-                                        image_data = ID3(fileobj=file_stream).getall("APIC")[0].data
-                                    except ID3NoHeaderError:
-                                        image_data = MP4(fileobj=file_stream).tags["covr"][0]
-                                    image = Image.open(BytesIO(image_data))
-                                    image.save(temp, image.format)
-                                    album.image = File(temp, name="artwork.{}".format(image.format))
-                                    album.save()
-                                    self.stdout.write(self.style.SUCCESS("Album Created: {}".format(album)))
+                album = track["Album"]
+                album_artist = track["Album Artist"]
+                artist = track["Artist"]
+                name = track["Name"]
+                persistent_id = track["Persistent ID"]
+                track_id = track["Track ID"]
 
-                            if song_created:
-                                song.file = File(file_stream)
-                                song.save()
-                                self.stdout.write(self.style.SUCCESS("Song Imported: {}".format(name)))
+                album, album_created = Album.objects.get_or_create(artist=album_artist, name=album)
+                song, song_created = Song.objects.get_or_create(
+                    album=album,
+                    artist=artist,
+                    name=name,
+                    persistent_id=persistent_id
+                )
+                tracks[track_id] = song
 
-            for playlist in itunes_library["Playlists"]:
-                name = playlist["Name"]
-                if name in IGNORED_PLAYLISTS:
-                    continue
-                persistent_id = playlist["Playlist Persistent ID"]
-                playlist_items = playlist.get("Playlist Items", [])
-                playlist, playlist_created = Playlist.objects.get_or_create(name=name, persistent_id=persistent_id)
-                playlist.songs.set([tracks[item["Track ID"]] for item in playlist_items])
-                if playlist_created:
-                    self.stdout.write(self.style.SUCCESS("Playlist Created: {}".format(name)))
-                else:
-                    self.stdout.write(self.style.SUCCESS("Playlist Updated: {}".format(name)))
+                if album_created or song_created:
+                    with open(location, "rb") as file_stream:
+                        if album_created:
+                            with NamedTemporaryFile() as temp:
+                                try:
+                                    image_data = ID3(fileobj=file_stream).getall("APIC")[0].data
+                                except ID3NoHeaderError:
+                                    image_data = MP4(fileobj=file_stream).tags["covr"][0]
+                                image = Image.open(BytesIO(image_data))
+                                image.save(temp, image.format)
+                                album.image = File(temp, name="artwork.{}".format(image.format))
+                                album.save()
+                                self.stdout.write(self.style.SUCCESS("Album Created: {}".format(album)))
+
+                        if song_created:
+                            song.file = File(file_stream)
+                            song.save()
+                            self.stdout.write(self.style.SUCCESS("Song Imported: {}".format(name)))
+
+        for playlist in itunes_library["Playlists"]:
+            name = playlist["Name"]
+            if name in IGNORED_PLAYLISTS:
+                continue
+            persistent_id = playlist["Playlist Persistent ID"]
+            playlist_items = playlist.get("Playlist Items", [])
+            playlist, playlist_created = Playlist.objects.get_or_create(name=name, persistent_id=persistent_id)
+            playlist.songs.set([tracks[item["Track ID"]] for item in playlist_items])
+            if playlist_created:
+                self.stdout.write(self.style.SUCCESS("Playlist Created: {}".format(name)))
+            else:
+                self.stdout.write(self.style.SUCCESS("Playlist Updated: {}".format(name)))

@@ -185,6 +185,14 @@ zappa undeploy dev
 To run these commands locally for a remote instance of the application you have to set the same environment variables as your `zappa` settings file.
 Also make sure that your RDS instance is publicly accessible and its security group allows inbound traffic from your IP address.
 
+Some management commands rely on an iTunes library XML file. To export your iTunes library as a XML file enable the following setting in iTunes.
+```
+Edit
+-> Preferences
+-> Advanced
+-> Share iTunes Library XML with other applications
+```
+
 ### clear_database
 
 Drop all model objects in the `music` app.
@@ -196,17 +204,17 @@ python manage.py clear_database
 zappa manage dev clear_database
 ```
 
+### evaluate_library
+
+Check your iTunes library for compatibility.
+
+```bash
+python manage.py evaluate_library "path/to/iTunes/iTunes Music Library.xml"
+```
+
 ### seed_database
 
-Create database entries for each audio file and playlist in your iTunes library.
-
-Export your iTunes library as a XML file.
-```
-Edit
--> Preferences
--> Advanced
--> Share iTunes Library XML with other applications
-```
+Create database entries for each audio file, album, and playlist in your iTunes library.
 
 ```bash
 python manage.py seed_database "path/to/iTunes/iTunes Music Library.xml"
