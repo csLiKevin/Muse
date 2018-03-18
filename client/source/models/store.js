@@ -1,10 +1,10 @@
-import {useStrict} from "mobx";
+import {configure} from "mobx";
 
 import {Player} from "./Player";
 import {Songs} from "./Songs";
 
 
-useStrict(true);
+configure({enforceActions: true});
 
 export const store = {
     player: new Player(),
