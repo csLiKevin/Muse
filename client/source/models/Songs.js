@@ -46,6 +46,7 @@ export class Songs {
 
     @action
     getAllSongs() {
+        // TODO: Assign a unique ID to these objects.
         this.enableLoading();
         this._lockLoading = true;
         return this.getSongs().then((firstPage) => {

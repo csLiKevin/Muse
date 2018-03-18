@@ -1,4 +1,4 @@
-export const PLAYER_HEIGHT = 76; // px
+export const PLAYER_HEIGHT = 48; // px
 
 export default {
     PLAYER_HEIGHT
