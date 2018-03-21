@@ -4,10 +4,13 @@ import React, {Component} from "react";
 import {Route, Switch} from "react-router-dom"
 
 import {BackgroundImage} from "./BackgroundImage";
-import {PageNotFound} from "./PageNotFound";
-import {Player} from "./Player";
-import {PlayerPage} from "./PlayerPage";
 import {HomePage} from "./HomePage";
+import {Navigation} from "./Navigation";
+import {PageNotFound} from "./PageNotFound";
+import {PlaybackControls} from "./PlaybackControls";
+import {PlaybackProgress} from "./PlaybackProgress";
+import {PlayerPage} from "./PlayerPage";
+import {FOOTER_HEIGHT} from "../utils/constants";
 import {hexToRgba} from "../utils/functions";
 
 
@@ -27,12 +30,21 @@ const theme = createMuiTheme({
         },
         text: {
             primary: grey[50],
-            secondary: hexToRgba(grey[400], 90)
+            secondary: grey[50]
         }
     }
 });
 
 @withStyles(() => ({
+    action: {
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "space-between"
+    },
+    footer: {
+        position: "fixed",
+        width: "100%"
+    },
     root: {
         backgroundColor: hexToRgba(grey[900], 90),
         height: "100%"
@@ -45,17 +57,54 @@ export class Client extends Component {
         };
     }
 
+    constructor(props, context) {
+        super(props, context);
+        this.state = {footerHeight: FOOTER_HEIGHT};
+        this.updateFooterSize = this.updateFooterSize.bind(this);
+    }
+
+    componentWillMount() {
+        // todo debounce this event
+        window.addEventListener("resize", this.updateFooterSize, true);
+    }
+
+    componentDidMount() {
+        this.updateFooterSize();
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.updateFooterSize, true);
+    }
+
+    updateFooterSize() {
+        if (this.footer) {
+            this.setState({footerHeight: this.footer.clientHeight});
+        }
+    }
+
     render() {
+        const {classes} = this.props;
+        const {footerHeight} = this.state;
+        const pageStyle = {height: `calc(100% - ${footerHeight}px)`};
+
         return (
             <MuiThemeProvider theme={theme}>
-                <div className={this.props.classes.root}>
+                <div className={classes.root}>
                     <BackgroundImage/>
-                    <Switch>
-                        <Route exact path="/" component={HomePage}/>
-                        <Route exact path="/player/" component={PlayerPage}/>
-                        <Route component={PageNotFound}/>
-                    </Switch>
-                    <Player />
+                    <div style={pageStyle}>
+                        <Switch>
+                            <Route exact path="/" component={HomePage}/>
+                            <Route exact path="/player/" component={PlayerPage}/>
+                            <Route component={PageNotFound}/>
+                        </Switch>
+                    </div>
+                    <div className={classes.footer} ref={footer => this.footer = footer}>
+                        <PlaybackProgress/>
+                        <div className={classes.action}>
+                            <PlaybackControls/>
+                            <Navigation/>
+                        </div>
+                    </div>
                 </div>
             </MuiThemeProvider>
         );

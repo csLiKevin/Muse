@@ -1,6 +1,6 @@
 import {CardMedia, Fade, withStyles} from "material-ui";
 import React, {Component} from "react";
-import {inject, observer} from "mobx-react/index";
+import {inject, observer} from "mobx-react";
 import PropTypes from "proptypes";
 
 

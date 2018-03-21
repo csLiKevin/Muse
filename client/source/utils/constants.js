@@ -1,5 +1,5 @@
-export const PLAYER_HEIGHT = 48; // px
+export const FOOTER_HEIGHT = 52; // px
 
 export default {
-    PLAYER_HEIGHT
+    FOOTER_HEIGHT
 };

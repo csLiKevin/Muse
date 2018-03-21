@@ -1,11 +1,10 @@
-import {Fade, IconButton, LinearProgress, Typography, withStyles} from 'material-ui';
+import {Fade, IconButton, Typography, withStyles} from 'material-ui';
 import {PauseCircleOutline, PlayCircleOutline, SkipNext, SkipPrevious, VolumeUp} from "material-ui-icons";
 import {inject, observer} from "mobx-react";
 import PropTypes from "proptypes";
 import React, {Component} from "react";
 
 import {LoadingAnimation} from "./LoadingAnimation";
-import {PLAYER_HEIGHT} from "../utils/constants";
 import {formatTime} from "../utils/functions";
 
 
@@ -15,23 +14,15 @@ import {formatTime} from "../utils/functions";
     return {
         duration: {
             display: "inline-block",
+            height: "100%",
             marginLeft: `${1.5 * spacingUnit}px`,
             marginRight: `${1.5 * spacingUnit}px`
-        },
-        progress: {
-            height: `${spacingUnit / 2}px`
-        },
-        root: {
-            bottom: 0,
-            height: `${PLAYER_HEIGHT}px`,
-            position: "fixed",
-            width: "100%"
         }
     };
 })
 @inject(({player}) => ({player}))
 @observer
-export class Player extends Component {
+export class PlaybackControls extends Component {
     static get propTypes() {
         return {
             classes: PropTypes.object.isRequired,
@@ -79,17 +70,8 @@ export class Player extends Component {
             centerControlOnClick = this.handlePause;
         }
 
-        const playbackProgress = currentTime / duration * 100 || 0;
-
         return (
             <div className={classes.root}>
-                <Fade in={duration}>
-                    <LinearProgress
-                        className={classes.progress}
-                        value={playbackProgress}
-                        variant="determinate"
-                    />
-                </Fade>
                 <IconButton color="primary" disabled={!hasHistory} onClick={ this.handlePlayPrevious }>
                     <SkipPrevious/>
                 </IconButton>
@@ -102,7 +84,7 @@ export class Player extends Component {
                 <IconButton disabled>
                     <VolumeUp/>
                 </IconButton>
-                <Fade in={duration}>
+                <Fade in={duration > 0}>
                     <Typography className={classes.duration} color="textSecondary" variant="body2">
                         {formatTime(currentTime)} / {formatTime(duration)}
                     </Typography>
@@ -111,4 +93,4 @@ export class Player extends Component {
         );
     }
 }
-export default Player;
+export default PlaybackControls;

@@ -2,8 +2,6 @@ import {Grow, Typography, withStyles} from "material-ui";
 import PropTypes from "proptypes";
 import React, {Component} from "react";
 
-import {Page} from "./Page";
-
 
 @withStyles(() => ({
     container: {
@@ -21,14 +19,14 @@ export class PageNotFound extends Component {
     }
 
     render() {
+        const {classes} = this.props;
+
         return (
-            <Page>
-                <Grow in>
-                    <div className={this.props.classes.container}>
-                        <Typography color="textSecondary" variant="display4">404</Typography>
-                    </div>
-                </Grow>
-            </Page>
+            <Grow in>
+                <div className={classes.container}>
+                    <Typography color="textSecondary" variant="display4">404</Typography>
+                </div>
+            </Grow>
         );
     }
 }
