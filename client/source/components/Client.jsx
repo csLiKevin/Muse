@@ -10,7 +10,7 @@ import {PageNotFound} from "./PageNotFound";
 import {PlaybackControls} from "./PlaybackControls";
 import {PlaybackProgress} from "./PlaybackProgress";
 import {PlayerPage} from "./PlayerPage";
-import {FOOTER_HEIGHT} from "../utils/constants";
+import {FOOTER_HEIGHT, ROUTES} from "../utils/constants";
 import {hexToRgba} from "../utils/functions";
 
 
@@ -59,12 +59,12 @@ export class Client extends Component {
 
     constructor(props, context) {
         super(props, context);
+        this.footer = {};
         this.state = {footerHeight: FOOTER_HEIGHT};
         this.updateFooterSize = this.updateFooterSize.bind(this);
     }
 
     componentWillMount() {
-        // todo debounce this event
         window.addEventListener("resize", this.updateFooterSize, true);
     }
 
@@ -77,9 +77,7 @@ export class Client extends Component {
     }
 
     updateFooterSize() {
-        if (this.footer) {
-            this.setState({footerHeight: this.footer.clientHeight});
-        }
+        this.setState({footerHeight: this.footer.clientHeight});
     }
 
     render() {
@@ -93,8 +91,9 @@ export class Client extends Component {
                     <BackgroundImage/>
                     <div style={pageStyle}>
                         <Switch>
-                            <Route exact path="/" component={HomePage}/>
-                            <Route exact path="/player/" component={PlayerPage}/>
+                            <Route {...ROUTES.history} component={PlayerPage}/>
+                            <Route {...ROUTES.home} component={HomePage}/>
+                            <Route {...ROUTES.queue} component={PlayerPage}/>
                             <Route component={PageNotFound}/>
                         </Switch>
                     </div>
