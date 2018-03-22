@@ -18,8 +18,8 @@ const {green, purple, grey} = colors;
 const theme = createMuiTheme({
     palette: {
         action: {
-            active: hexToRgba(green.A700, 90),
-            disabled: hexToRgba(grey[400], 90)
+            active: green.A700,
+            disabled: grey[400]
         },
         primary: {
             contrastText: grey[50],
@@ -30,7 +30,7 @@ const theme = createMuiTheme({
         },
         text: {
             primary: grey[50],
-            secondary: grey[50]
+            secondary: grey[300]
         }
     }
 });

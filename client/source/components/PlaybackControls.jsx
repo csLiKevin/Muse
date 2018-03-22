@@ -12,11 +12,13 @@ import {formatTime} from "../utils/functions";
     const spacingUnit = theme.spacing.unit;
 
     return {
-        duration: {
+        text: {
             display: "inline-block",
-            height: "100%",
             marginLeft: `${1.5 * spacingUnit}px`,
             marginRight: `${1.5 * spacingUnit}px`
+        },
+        textContainer: {
+            display: "inline-block"
         }
     };
 })
@@ -85,9 +87,17 @@ export class PlaybackControls extends Component {
                     <VolumeUp/>
                 </IconButton>
                 <Fade in={duration > 0}>
-                    <Typography className={classes.duration} color="textSecondary" variant="body2">
-                        {formatTime(currentTime)} / {formatTime(duration)}
-                    </Typography>
+                    <div className={classes.textContainer}>
+                        <Typography className={classes.text} variant="body2">
+                            {formatTime(currentTime)} / {formatTime(duration)}
+                        </Typography>
+                        <Typography className={classes.text} variant="body2">
+                            {currentSong.name}
+                        </Typography>
+                        <Typography className={classes.text} color="textSecondary">
+                            {currentSong.album.name}
+                        </Typography>
+                    </div>
                 </Fade>
             </div>
         );

@@ -8,12 +8,20 @@ import {ROUTES} from "../utils/constants";
 
 
 @withStyles(theme => {
+    const primary = theme.palette.action.active;
     const spacingUnit = theme.spacing.unit;
+    const textPrimary = theme.palette.text.primary;
 
     return {
         root: {
             minWidth: "initial",
             width: `${spacingUnit * 6}px`
+        },
+        textColorPrimary: {
+            color: textPrimary
+        },
+        textColorPrimarySelected: {
+            color: primary
         }
     };
 })
@@ -39,7 +47,11 @@ export class Navigation extends Component {
 
     render() {
         const {classes, location: {pathname}} = this.props;
-        const tabClassesOverride = {root: classes.root};
+        const tabClassesOverride = {
+            root: classes.root,
+            textColorPrimary: classes.textColorPrimary,
+            textColorPrimarySelected: classes.textColorPrimarySelected
+        };
 
         return (
             <Tabs indicatorColor="primary" onChange={this.handleChange} value={pathname} textColor="primary">
