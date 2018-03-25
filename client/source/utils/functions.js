@@ -1,4 +1,14 @@
+import camelCase from "lodash.camelcase";
+
+
 let _idCounter = 0;
+
+export function camelCaseObjectKeys(object) {
+    return Object.entries(object).reduce((accumulator, [key, value]) => {
+        accumulator[camelCase(key)] = value;
+        return accumulator;
+    }, {});
+}
 
 export function formatTime(time) {
     if (isNaN(time)) {
@@ -32,6 +42,13 @@ export function hexToRgba(hex, opacity) {
     return `rgba(${red}, ${green}, ${blue}, ${opacity / 100.0})`;
 }
 
+export function reversePath(path, parameters) {
+    return Object.entries(parameters).reduce(
+        (accumulator, [key, value]) => accumulator.replace(`:${key}`, value),
+        path
+    );
+}
+
 export function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
@@ -40,8 +57,10 @@ export function shuffleArray(array) {
 }
 
 export default {
+    camelCaseObjectKeys,
     formatTime,
     generateId,
     hexToRgba,
+    reversePath,
     shuffleArray
 };

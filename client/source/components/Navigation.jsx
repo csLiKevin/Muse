@@ -58,19 +58,16 @@ export class Navigation extends Component {
                 <Tab
                     classes={tabClassesOverride}
                     icon={<History/>}
-                    onChange={this.handleChange}
                     value={ROUTES.history.path}
                 />
                 <Tab
                     classes={tabClassesOverride}
                     icon={<FormatListNumbered/>}
-                    onChange={this.handleChange}
                     value={ROUTES.queue.path}
                 />
                 <Tab
                     classes={tabClassesOverride}
                     icon={<Home/>}
-                    onChange={this.handleChange}
                     value={ROUTES.home.path}
                 />
             </Tabs>

@@ -5,7 +5,9 @@ import PropTypes from "proptypes";
 import React, {Component} from "react";
 
 import {LoadingAnimation} from "./LoadingAnimation";
-import {formatTime} from "../utils/functions";
+import {TextLink} from "./TextLink";
+import {ROUTES} from "../utils/constants";
+import {formatTime, reversePath} from "../utils/functions";
 
 
 @withStyles(theme => {
@@ -96,12 +98,25 @@ export class PlaybackControls extends Component {
                         <Typography className={classes.text} variant="body2">
                             {formatTime(currentTime)} / {formatTime(duration)}
                         </Typography>
-                        <Typography className={classes.text} variant="body2">
+                        <TextLink
+                            className={classes.text}
+                            variant="body2"
+                            to={reversePath(ROUTES.song.path, {persistentId: currentSong.persistentId})}
+                        >
                             {currentSong.name}
-                        </Typography>
-                        <Typography className={classes.text} color="textSecondary">
+                        </TextLink>
+                        <TextLink
+                            className={classes.text}
+                            variant="body2"
+                            to={
+                                reversePath(
+                                    ROUTES.album.path,
+                                    {artist: currentSong.album.artist, name: currentSong.album.name}
+                                )
+                            }
+                        >
                             {currentSong.album.name}
-                        </Typography>
+                        </TextLink>
                     </div>
                 </Fade>
             </div>

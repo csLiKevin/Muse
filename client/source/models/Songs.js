@@ -2,6 +2,7 @@ import {action, computed, observable} from "mobx";
 import queryString from "query-string";
 
 import {ApiClient} from "../utils/apiClient";
+import {camelCaseObjectKeys} from "../utils/functions";
 
 
 export class Songs {
@@ -36,11 +37,12 @@ export class Songs {
         this.enableLoading();
         return ApiClient.getSongs(filters).then(json => {
             const {count, results} = json;
-            this.cache[queryParameters] = results;
+            const sanitizedResults = results.map(result => camelCaseObjectKeys(result));
+            this.cache[queryParameters] = sanitizedResults;
             this.count = count;
             this.filters = filters;
             this.disableLoading();
-            return results;
+            return sanitizedResults;
         });
     }
 

@@ -3,6 +3,7 @@ import PropTypes from "proptypes";
 import React, {Component} from "react";
 import {Route, Switch} from "react-router-dom"
 
+import {AlbumPage} from "./AlbumPage";
 import {BackgroundImage} from "./BackgroundImage";
 import {HistoryPage} from "./HistoryPage";
 import {HomePage} from "./HomePage";
@@ -10,6 +11,7 @@ import {Navigation} from "./Navigation";
 import {PageNotFound} from "./PageNotFound";
 import {PlaybackControls} from "./PlaybackControls";
 import {PlaybackProgress} from "./PlaybackProgress";
+import {SongPage} from "./SongPage";
 import {QueuePage} from "./QueuePage";
 import {FOOTER_HEIGHT, ROUTES} from "../utils/constants";
 import {hexToRgba} from "../utils/functions";
@@ -103,9 +105,11 @@ export class Client extends Component {
                     <BackgroundImage/>
                     <div className={classes.content} style={pageStyle}>
                         <Switch>
+                            <Route {...ROUTES.album} component={AlbumPage}/>
                             <Route {...ROUTES.history} component={HistoryPage}/>
                             <Route {...ROUTES.home} component={HomePage}/>
                             <Route {...ROUTES.queue} component={QueuePage}/>
+                            <Route {...ROUTES.song} component={SongPage}/>
                             <Route component={PageNotFound}/>
                         </Switch>
                     </div>
@@ -122,5 +126,3 @@ export class Client extends Component {
     }
 }
 export default Client;
-
-// todo, Create psuedo link component
