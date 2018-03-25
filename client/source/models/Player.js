@@ -1,5 +1,7 @@
 import {action, computed, observable} from "mobx";
 
+import {generateId} from "../utils/functions";
+
 
 export class Player {
     @observable _currentSong;
@@ -99,12 +101,12 @@ export class Player {
 
     @action
     queueSong(song) {
-        this.queue.push(song);
+        this.queue.push({...song, identifier: generateId()});
     }
 
     @action
     queueSongs(songs) {
-        this.queue.push(...songs);
+        songs.forEach(song => this.queueSong(song));
     }
 
     @computed

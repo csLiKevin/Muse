@@ -1,3 +1,5 @@
+let _idCounter = 0;
+
 export function formatTime(time) {
     if (isNaN(time)) {
         return "--:--";
@@ -6,6 +8,10 @@ export function formatTime(time) {
     const minutes = Math.floor(time / 60);
     const seconds = time - minutes * 60;
     return `${("00" + minutes).slice(-2)}:${("00" + seconds).slice(-2)}`;
+}
+
+export function generateId(prefix="") {
+    return `${prefix}${_idCounter++}`;
 }
 
 export function hexToRgba(hex, opacity) {
@@ -35,6 +41,7 @@ export function shuffleArray(array) {
 
 export default {
     formatTime,
+    generateId,
     hexToRgba,
     shuffleArray
 };

@@ -4,12 +4,13 @@ import React, {Component} from "react";
 import {Route, Switch} from "react-router-dom"
 
 import {BackgroundImage} from "./BackgroundImage";
+import {HistoryPage} from "./HistoryPage";
 import {HomePage} from "./HomePage";
 import {Navigation} from "./Navigation";
 import {PageNotFound} from "./PageNotFound";
 import {PlaybackControls} from "./PlaybackControls";
 import {PlaybackProgress} from "./PlaybackProgress";
-import {PlayerPage} from "./PlayerPage";
+import {QueuePage} from "./QueuePage";
 import {FOOTER_HEIGHT, ROUTES} from "../utils/constants";
 import {hexToRgba} from "../utils/functions";
 
@@ -42,12 +43,14 @@ const theme = createMuiTheme({
         justifyContent: "space-between"
     },
     footer: {
+        backgroundColor: hexToRgba(grey[900], 80),
+        bottom: 0,
         position: "fixed",
         width: "100%"
     },
     root: {
         backgroundColor: hexToRgba(grey[900], 90),
-        height: "100%"
+        minHeight: "100%"
     }
 }))
 export class Client extends Component {
@@ -83,7 +86,7 @@ export class Client extends Component {
     render() {
         const {classes} = this.props;
         const {footerHeight} = this.state;
-        const pageStyle = {height: `calc(100% - ${footerHeight}px)`};
+        const pageStyle = {paddingBottom: `${footerHeight}px)`};
 
         return (
             <MuiThemeProvider theme={theme}>
@@ -91,9 +94,9 @@ export class Client extends Component {
                     <BackgroundImage/>
                     <div style={pageStyle}>
                         <Switch>
-                            <Route {...ROUTES.history} component={PlayerPage}/>
+                            <Route {...ROUTES.history} component={HistoryPage}/>
                             <Route {...ROUTES.home} component={HomePage}/>
-                            <Route {...ROUTES.queue} component={PlayerPage}/>
+                            <Route {...ROUTES.queue} component={QueuePage}/>
                             <Route component={PageNotFound}/>
                         </Switch>
                     </div>

@@ -7,7 +7,7 @@ import PropTypes from "proptypes";
 @withStyles(() => ({
     root: {
         height: "100%",
-        position: "absolute",
+        position: "fixed",
         width: "100%",
         zIndex: -1
     }
