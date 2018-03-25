@@ -36,23 +36,32 @@ const theme = createMuiTheme({
     }
 });
 
-@withStyles(() => ({
-    action: {
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "space-between"
-    },
-    footer: {
-        backgroundColor: hexToRgba(grey[900], 80),
-        bottom: 0,
-        position: "fixed",
-        width: "100%"
-    },
-    root: {
-        backgroundColor: hexToRgba(grey[900], 90),
-        minHeight: "100%"
-    }
-}))
+@withStyles(theme => {
+    const spacingUnit = theme.spacing.unit;
+
+    return {
+        action: {
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between"
+        },
+        content: {
+            flex: 1,
+            padding: `${spacingUnit * 2}px`
+        },
+        footer: {
+            backgroundColor: hexToRgba(grey[900], 80),
+            bottom: 0,
+            position: "fixed",
+            width: "100%"
+        },
+        root: {
+            backgroundColor: hexToRgba(grey[900], 90),
+            display: "flex",
+            minHeight: "100%"
+        }
+    };
+})
 export class Client extends Component {
     static get propTypes() {
         return {
@@ -86,13 +95,13 @@ export class Client extends Component {
     render() {
         const {classes} = this.props;
         const {footerHeight} = this.state;
-        const pageStyle = {paddingBottom: `${footerHeight}px)`};
+        const pageStyle = {paddingBottom: `${footerHeight}px`};
 
         return (
             <MuiThemeProvider theme={theme}>
                 <div className={classes.root}>
                     <BackgroundImage/>
-                    <div style={pageStyle}>
+                    <div className={classes.content} style={pageStyle}>
                         <Switch>
                             <Route {...ROUTES.history} component={HistoryPage}/>
                             <Route {...ROUTES.home} component={HomePage}/>
@@ -113,3 +122,5 @@ export class Client extends Component {
     }
 }
 export default Client;
+
+// todo, Create psuedo link component

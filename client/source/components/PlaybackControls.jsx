@@ -15,7 +15,12 @@ import {formatTime} from "../utils/functions";
         text: {
             display: "inline-block",
             marginLeft: `${1.5 * spacingUnit}px`,
-            marginRight: `${1.5 * spacingUnit}px`
+            marginRight: `${1.5 * spacingUnit}px`,
+            maxWidth: "250px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            verticalAlign: "middle",
+            whiteSpace: "nowrap"
         },
         textContainer: {
             display: "inline-block"
