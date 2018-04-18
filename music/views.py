@@ -1,4 +1,5 @@
-from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.serializers import ModelSerializer
 
@@ -27,25 +28,17 @@ class SongSerializer(ModelSerializer):
         read_only_fields = fields
 
 
-class Album(RetrieveAPIView):
-    queryset = AlbumModel.objects.all()
+class AlbumList(ListAPIView):
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ("artist", "name")
+    pagination_class = ClassicPagination
+    queryset = AlbumModel.objects.order_by("name").all()
     serializer_class = AlbumSerializer
-
-    def get_object(self):
-        queryset = self.get_queryset()
-        artist = self.kwargs.get("artist")
-        name = self.kwargs.get("name")
-
-        return get_object_or_404(queryset, artist=artist, name=name)
-
-
-class Song(RetrieveAPIView):
-    lookup_field = "persistent_id"
-    queryset = SongModel.objects.all()
-    serializer_class = SongSerializer
 
 
 class SongList(ListAPIView):
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ("persistent_id",)
     pagination_class = ClassicPagination
-    queryset = SongModel.objects.all()
+    queryset = SongModel.objects.order_by("name").all()
     serializer_class = SongSerializer

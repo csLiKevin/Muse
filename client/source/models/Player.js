@@ -19,7 +19,6 @@ export class Player {
         this._currentSong = undefined;
         this.audio = new Audio();
         this.history = [];
-        this.loading = false;
         this.queue = [];
 
         this.audio.addEventListener("canplay", action(() => {
@@ -113,7 +112,7 @@ export class Player {
     get currentSong() {
         return this._currentSong
             ? {...this._currentSong, audioStatus: this._audioStatus}
-            : { album: {}, audioStatus: this._audioStatus };
+            : {album: {}, audioStatus: this._audioStatus}; // TODO: Create song model with defaults.
     }
 
     @computed

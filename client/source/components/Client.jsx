@@ -11,7 +11,6 @@ import {Navigation} from "./Navigation";
 import {PageNotFound} from "./PageNotFound";
 import {PlaybackControls} from "./PlaybackControls";
 import {PlaybackProgress} from "./PlaybackProgress";
-import {SongPage} from "./SongPage";
 import {QueuePage} from "./QueuePage";
 import {FOOTER_HEIGHT, ROUTES} from "../utils/constants";
 import {hexToRgba} from "../utils/functions";
@@ -109,7 +108,6 @@ export class Client extends Component {
                             <Route {...ROUTES.history} component={HistoryPage}/>
                             <Route {...ROUTES.home} component={HomePage}/>
                             <Route {...ROUTES.queue} component={QueuePage}/>
-                            <Route {...ROUTES.song} component={SongPage}/>
                             <Route component={PageNotFound}/>
                         </Switch>
                     </div>

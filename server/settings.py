@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "django_cleanup",
+    "django_filters",
     "rest_framework",
 
     "client",
@@ -116,7 +117,8 @@ if STAGE != LOCAL_STAGE:
         "USER": environ["DJANGO_DATABASE_USER"]
     }
     AWS_DEFAULT_ACL = "private"
+    AWS_IS_GZIPPED = True
     AWS_STORAGE_BUCKET_NAME = environ["DJANGO_AWS_STORAGE_BUCKET_NAME"]
     AWS_QUERYSTRING_AUTH = False
-    STATICFILES_STORAGE = "server.storage_backends.StaticStorage"
     DEFAULT_FILE_STORAGE = "server.storage_backends.MediaStorage"
+    STATICFILES_STORAGE = "server.storage_backends.StaticStorage"

@@ -5,10 +5,10 @@ import React, {Component} from "react";
 import {withRouter} from "react-router-dom";
 
 import {ROUTES} from "../utils/constants";
+import {findRoute} from "../utils/functions";
 
 
 @withStyles(theme => {
-    const primary = theme.palette.action.active;
     const spacingUnit = theme.spacing.unit;
     const textPrimary = theme.palette.text.primary;
 
@@ -19,9 +19,6 @@ import {ROUTES} from "../utils/constants";
         },
         textColorPrimary: {
             color: textPrimary
-        },
-        textColorPrimarySelected: {
-            color: primary
         }
     };
 })
@@ -41,20 +38,28 @@ export class Navigation extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
+    get value() {
+        const {location: {pathname}} = this.props;
+
+        if (![ROUTES.history.path, ROUTES.home.path, ROUTES.queue.path].includes(findRoute(pathname).path)) {
+            return false;
+        }
+        return pathname;
+    }
+
     handleChange(event, pathname) {
         this.props.history.push(pathname);
     }
 
     render() {
-        const {classes, location: {pathname}} = this.props;
+        const {classes} = this.props;
         const tabClassesOverride = {
             root: classes.root,
-            textColorPrimary: classes.textColorPrimary,
-            textColorPrimarySelected: classes.textColorPrimarySelected
+            textColorPrimary: classes.textColorPrimary
         };
 
         return (
-            <Tabs indicatorColor="primary" onChange={this.handleChange} value={pathname} textColor="primary">
+            <Tabs indicatorColor="primary" onChange={this.handleChange} value={this.value} textColor="primary">
                 <Tab
                     classes={tabClassesOverride}
                     icon={<History/>}

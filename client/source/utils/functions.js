@@ -1,13 +1,14 @@
-import camelCase from "lodash.camelcase";
+import camelcase from "lodash.camelcase";
+import snakecase from "lodash.snakecase";
+import {matchPath} from "react-router-dom";
+
+import {ROUTES} from "./constants";
 
 
 let _idCounter = 0;
 
-export function camelCaseObjectKeys(object) {
-    return Object.entries(object).reduce((accumulator, [key, value]) => {
-        accumulator[camelCase(key)] = value;
-        return accumulator;
-    }, {});
+export function findRoute(pathname) {
+    return Object.values(ROUTES).find(route => matchPath(pathname, route));
 }
 
 export function formatTime(time) {
@@ -42,6 +43,21 @@ export function hexToRgba(hex, opacity) {
     return `rgba(${red}, ${green}, ${blue}, ${opacity / 100.0})`;
 }
 
+export function pythonize(object, reverse=false) {
+    const keyTransformationFunction = reverse ? camelcase : snakecase;
+
+    return Object.entries(object).reduce((accumulator, [key, value]) => {
+        if (Array.isArray(value)) {
+            value = value.map(part => pythonize(part, reverse));
+        } else if (value && typeof value === "object") {
+            value = pythonize(value, reverse);
+        }
+
+        accumulator[keyTransformationFunction(key)] = value;
+        return accumulator;
+    }, {});
+}
+
 export function reversePath(path, parameters) {
     return Object.entries(parameters).reduce(
         (accumulator, [key, value]) => accumulator.replace(`:${key}`, value),
@@ -57,10 +73,11 @@ export function shuffleArray(array) {
 }
 
 export default {
-    camelCaseObjectKeys,
+    findRoute,
     formatTime,
     generateId,
     hexToRgba,
+    pythonize,
     reversePath,
     shuffleArray
 };

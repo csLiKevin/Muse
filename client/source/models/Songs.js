@@ -2,15 +2,19 @@ import {action, computed, observable} from "mobx";
 import queryString from "query-string";
 
 import {ApiClient} from "../utils/apiClient";
-import {camelCaseObjectKeys} from "../utils/functions";
 
 
 export class Songs {
-    @observable _lockLoading = false;
-    @observable cache = {};
-    @observable count = 0;
-    @observable filters = {};
-    @observable loading = false;
+    @observable filters;
+    @observable loading;
+
+    constructor() {
+        this._lockLoading = false;
+        this.cache = {};
+        this.count = 0;
+        this.filters = {};
+        this.loading = false;
+    }
 
     @action
     disableLoading() {
@@ -29,21 +33,21 @@ export class Songs {
     @action
     getSongs(filters={}) {
         const queryParameters = queryString.stringify(filters);
+        const cachedSongs = this.cache[queryParameters];
 
-        if (this.cache[queryParameters]) {
-            return Promise.resolve(this.cache[queryParameters]);
+        if (cachedSongs) {
+            return Promise.resolve(cachedSongs);
         }
 
         this.enableLoading();
-        return ApiClient.getSongs(filters).then(json => {
+        return ApiClient.getSongs(filters).then(action(json => {
             const {count, results} = json;
-            const sanitizedResults = results.map(result => camelCaseObjectKeys(result));
-            this.cache[queryParameters] = sanitizedResults;
+            this.cache[queryParameters] = results;
             this.count = count;
             this.filters = filters;
             this.disableLoading();
-            return sanitizedResults;
-        });
+            return results;
+        }));
     }
 
     @action
@@ -68,7 +72,7 @@ export class Songs {
 
     @computed
     get inView() {
-        return this.cache[queryString.stringify(this.filters)];
+        return this.cache[queryString.stringify(this.filters)] || [];
     }
 }
 export default Songs;
