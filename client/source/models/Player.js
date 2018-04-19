@@ -90,7 +90,18 @@ export class Player {
         }
     }
 
-    playSong() {
+    @action
+    playSong(song) {
+        if (song) {
+            // Move the current song to the front of the queue.
+            if (this._currentSong) {
+                this.queue.unshift(this._currentSong);
+            }
+            // Add the requested song to the front of the queue.
+            this.queueSong(song);
+            this.queue.unshift(this.queue.pop());
+            this._currentSong = undefined;
+        }
         if (this._currentSong) {
             this.audio.play();
         } else {

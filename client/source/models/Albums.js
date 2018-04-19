@@ -1,11 +1,11 @@
 import {action, computed, observable} from "mobx";
 import queryString from "query-string";
 
-import {Song} from "../models/Song";
+import {Album} from "./Album";
 import {ApiClient} from "../utils/apiClient";
 
 
-export class Songs {
+export class Albums {
     @observable filters;
     @observable loading;
 
@@ -32,7 +32,7 @@ export class Songs {
     }
 
     @action
-    getSongs(filters={}) {
+    getAlbums(filters={}) {
         const queryParameters = queryString.stringify(filters);
         const cachedSongs = this.cache[queryParameters];
 
@@ -41,9 +41,9 @@ export class Songs {
         }
 
         this.enableLoading();
-        return ApiClient.getSongs(filters).then(action(json => {
+        return ApiClient.getAlbums(filters).then(action(json => {
             const {count, results} = json;
-            this.cache[queryParameters] = results.map(result => new Song(result));
+            this.cache[queryParameters] = results.map(result => new Album(result));
             this.count = count;
             this.filters = filters;
             this.disableLoading();
@@ -52,15 +52,15 @@ export class Songs {
     }
 
     @action
-    getAllSongs() {
+    getAllAlbums() {
         this.enableLoading();
         this._lockLoading = true;
-        return this.getSongs().then((firstPage) => {
+        return this.getAlbums().then((firstPage) => {
             const pageSize = firstPage.length;
             const numPages = Math.ceil(this.count / pageSize);
             const promises = [Promise.resolve(firstPage)];
             for (let page = 2; page <= numPages; page++) {
-                promises.push(this.getSongs({page}));
+                promises.push(this.getAlbums({page}));
             }
             return Promise.all(promises).then((results) => {
                 results = [].concat(...results);
@@ -76,4 +76,4 @@ export class Songs {
         return this.cache[queryString.stringify(this.filters)] || [];
     }
 }
-export default Songs;
+export default Albums;

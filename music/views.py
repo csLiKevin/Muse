@@ -1,4 +1,4 @@
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import CharFilter, DjangoFilterBackend, FilterSet
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.serializers import ModelSerializer
@@ -28,6 +28,15 @@ class SongSerializer(ModelSerializer):
         read_only_fields = fields
 
 
+class SongFilter(FilterSet):
+    album_artist = CharFilter(name="album__artist")
+    album_name = CharFilter(name="album__name")
+
+    class Meta:
+        model = SongModel
+        fields = ("album_artist", "album_name", "persistent_id",)
+
+
 class AlbumList(ListAPIView):
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ("artist", "name")
@@ -38,7 +47,7 @@ class AlbumList(ListAPIView):
 
 class SongList(ListAPIView):
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ("persistent_id",)
+    filter_class = SongFilter
     pagination_class = ClassicPagination
     queryset = SongModel.objects.order_by("name").all()
     serializer_class = SongSerializer
