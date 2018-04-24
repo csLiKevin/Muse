@@ -32,7 +32,12 @@ export class Songs {
     }
 
     @action
-    getSongs(filters={}) {
+    filter(filters) {
+        this.filters = filters;
+    }
+
+    @action
+    getSongs(filters={page: 1}) {
         const queryParameters = queryString.stringify(filters);
         const cachedSongs = this.cache[queryParameters];
 
@@ -45,7 +50,6 @@ export class Songs {
             const {count, results} = json;
             this.cache[queryParameters] = results.map(result => new Song(result));
             this.count = count;
-            this.filters = filters;
             this.disableLoading();
             return results;
         }));

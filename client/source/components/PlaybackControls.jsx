@@ -98,13 +98,9 @@ export class PlaybackControls extends Component {
                         <Typography className={classes.text} variant="body2">
                             {formatTime(currentTime)} / {formatTime(duration)}
                         </Typography>
-                        <TextLink
-                            className={classes.text}
-                            variant="body2"
-                            to={reversePath(ROUTES.song.path, {persistentId: currentSong.persistentId})}
-                        >
+                        <Typography className={classes.text} variant="body2">
                             {currentSong.name}
-                        </TextLink>
+                        </Typography>
                         <TextLink
                             className={classes.text}
                             variant="body2"

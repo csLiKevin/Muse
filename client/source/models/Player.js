@@ -17,18 +17,22 @@ export class Player {
             playing: false
         };
         this._currentSong = undefined;
+        this.callbacks = {};
         this.audio = new Audio();
         this.history = [];
         this.queue = [];
 
         this.audio.addEventListener("canplay", action(() => {
             this._audioStatus.loading = false;
+            if (this.callbacks.canPlay) {
+                this.callbacks.canPlay();
+            }
         }));
         this.audio.addEventListener("durationchange", action(() => {
             this._audioStatus.duration = this.audio.duration;
         }));
         this.audio.addEventListener("ended", () => {
-            this.playNextSong();
+            this.callbacks.ended ? this.callbacks.ended() : this.playNextSong();
         });
         this.audio.addEventListener("pause", action(() => {
             this._audioStatus.playing = false;
@@ -123,7 +127,7 @@ export class Player {
     get currentSong() {
         return this._currentSong
             ? {...this._currentSong, audioStatus: this._audioStatus}
-            : {album: {}, audioStatus: this._audioStatus}; // TODO: Create song model with defaults.
+            : {album: {}, audioStatus: {currentTime: NaN, duration: NaN}}; // TODO: Create song model with defaults.
     }
 
     @computed

@@ -1,6 +1,6 @@
 import {colors, createMuiTheme, MuiThemeProvider, withStyles} from "material-ui";
 import PropTypes from "proptypes";
-import React, {Component} from "react";
+import React, {Component, createRef} from "react";
 import {Route, Switch} from "react-router-dom"
 
 import {AlbumPage} from "./AlbumPage";
@@ -72,16 +72,13 @@ export class Client extends Component {
 
     constructor(props, context) {
         super(props, context);
-        this.footer = {};
+        this.footer = createRef();
         this.state = {footerHeight: FOOTER_HEIGHT};
         this.updateFooterSize = this.updateFooterSize.bind(this);
     }
 
-    componentWillMount() {
-        window.addEventListener("resize", this.updateFooterSize, true);
-    }
-
     componentDidMount() {
+        window.addEventListener("resize", this.updateFooterSize, true);
         this.updateFooterSize();
     }
 
@@ -90,7 +87,7 @@ export class Client extends Component {
     }
 
     updateFooterSize() {
-        this.setState({footerHeight: this.footer.clientHeight});
+        this.setState({footerHeight: this.footer.current.clientHeight});
     }
 
     render() {
@@ -111,7 +108,7 @@ export class Client extends Component {
                             <Route component={PageNotFound}/>
                         </Switch>
                     </div>
-                    <div className={classes.footer} ref={footer => this.footer = footer}>
+                    <div className={classes.footer} ref={this.footer}>
                         <PlaybackProgress/>
                         <div className={classes.action}>
                             <PlaybackControls/>

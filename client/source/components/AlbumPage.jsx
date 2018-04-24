@@ -48,9 +48,14 @@ export class AlbumPage extends Component {
     }
 
     componentWillMount() {
-        const {albums, match: {params: {artist, name}}, songs} = this.props;
+        this.componentWillReceiveProps(this.props);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const {albums, match: {params: {artist, name}}, songs} = nextProps;
+        const filters = {albumArtist: artist, albumName: name};
         albums.getAlbums({artist, name});
-        songs.getSongs({albumArtist: artist, albumName: name});
+        songs.getSongs(filters).then(() => songs.filter(filters));
     }
 
     get album() {
