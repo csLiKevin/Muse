@@ -1,4 +1,4 @@
-import {action, computed, observable} from "mobx";
+import {action, observable} from "mobx";
 import queryString from "query-string";
 
 import {Song} from "../models/Song";
@@ -6,14 +6,12 @@ import {ApiClient} from "../utils/apiClient";
 
 
 export class Songs {
-    @observable filters;
     @observable loading;
 
     constructor() {
         this._lockLoading = false;
         this.cache = {};
         this.count = 0;
-        this.filters = {};
         this.loading = false;
     }
 
@@ -29,11 +27,6 @@ export class Songs {
         if (!this._lockLoading) {
             this.loading = true;
         }
-    }
-
-    @action
-    filter(filters) {
-        this.filters = filters;
     }
 
     @action
@@ -53,31 +46,6 @@ export class Songs {
             this.disableLoading();
             return results;
         }));
-    }
-
-    @action
-    getAllSongs() {
-        this.enableLoading();
-        this._lockLoading = true;
-        return this.getSongs().then((firstPage) => {
-            const pageSize = firstPage.length;
-            const numPages = Math.ceil(this.count / pageSize);
-            const promises = [Promise.resolve(firstPage)];
-            for (let page = 2; page <= numPages; page++) {
-                promises.push(this.getSongs({page}));
-            }
-            return Promise.all(promises).then((results) => {
-                results = [].concat(...results);
-                this._lockLoading = false;
-                this.disableLoading();
-                return results;
-            });
-        });
-    }
-
-    @computed
-    get inView() {
-        return this.cache[queryString.stringify(this.filters)] || [];
     }
 }
 export default Songs;

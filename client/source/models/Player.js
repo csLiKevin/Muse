@@ -17,22 +17,23 @@ export class Player {
             playing: false
         };
         this._currentSong = undefined;
-        this.callbacks = {};
+        this.callbacks = {
+            canPlay: () => {},
+            ended: () => this.playNextSong()
+        };
         this.audio = new Audio();
         this.history = [];
         this.queue = [];
 
         this.audio.addEventListener("canplay", action(() => {
             this._audioStatus.loading = false;
-            if (this.callbacks.canPlay) {
-                this.callbacks.canPlay();
-            }
+            this.callbacks.canPlay();
         }));
         this.audio.addEventListener("durationchange", action(() => {
             this._audioStatus.duration = this.audio.duration;
         }));
         this.audio.addEventListener("ended", () => {
-            this.callbacks.ended ? this.callbacks.ended() : this.playNextSong();
+            this.callbacks.ended();
         });
         this.audio.addEventListener("pause", action(() => {
             this._audioStatus.playing = false;
@@ -46,18 +47,12 @@ export class Player {
         this.audio.addEventListener("timeupdate", action(() => {
             this._audioStatus.currentTime = this.audio.currentTime;
         }));
-
         this.audio.addEventListener("error", action(() => {
             // TODO: Temporary fix for "PIPELINE_ERROR_DECODE: Failed to send audio packet for decoding".
             const { currentTime, duration, src, error } = this.audio;
             console.log("*** ERROR ***", {currentTime, duration, src, error});
             this.playNextSong();
         }));
-    }
-
-    @action
-    clearQueue() {
-        this.queue = [];
     }
 
     pauseSong() {
@@ -118,16 +113,11 @@ export class Player {
         this.queue.push({...song, identifier: generateId()});
     }
 
-    @action
-    queueSongs(songs) {
-        songs.forEach(song => this.queueSong(song));
-    }
-
     @computed
     get currentSong() {
         return this._currentSong
             ? {...this._currentSong, audioStatus: this._audioStatus}
-            : {album: {}, audioStatus: {currentTime: NaN, duration: NaN}}; // TODO: Create song model with defaults.
+            : {album: {}, audioStatus: {currentTime: NaN, duration: NaN}};
     }
 
     @computed

@@ -1,15 +1,8 @@
 import camelcase from "lodash.camelcase";
 import snakecase from "lodash.snakecase";
-import {matchPath} from "react-router-dom";
-
-import {ROUTES} from "./constants";
 
 
 let _idCounter = 0;
-
-export function findRoute(pathname) {
-    return Object.values(ROUTES).find(route => matchPath(pathname, route));
-}
 
 export function formatTime(time) {
     if (isNaN(time)) {
@@ -58,26 +51,9 @@ export function pythonize(object, reverse=false) {
     }, {});
 }
 
-export function reversePath(path, parameters) {
-    return Object.entries(parameters).reduce(
-        (accumulator, [key, value]) => accumulator.replace(`:${key}`, value),
-        path
-    );
-}
-
-export function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
 export default {
-    findRoute,
     formatTime,
     generateId,
     hexToRgba,
-    pythonize,
-    reversePath,
-    shuffleArray
+    pythonize
 };

@@ -1,18 +1,12 @@
 import {colors, createMuiTheme, MuiThemeProvider, withStyles} from "material-ui";
+import {inject} from "mobx-react";
 import PropTypes from "proptypes";
-import React, {Component, createRef} from "react";
-import {Route, Switch} from "react-router-dom"
+import React, {Component} from "react";
 
-import {AlbumPage} from "./AlbumPage";
 import {BackgroundImage} from "./BackgroundImage";
-import {HistoryPage} from "./HistoryPage";
-import {HomePage} from "./HomePage";
-import {Navigation} from "./Navigation";
-import {PageNotFound} from "./PageNotFound";
 import {PlaybackControls} from "./PlaybackControls";
+import {PlaybackInformation} from "./PlaybackInformation";
 import {PlaybackProgress} from "./PlaybackProgress";
-import {QueuePage} from "./QueuePage";
-import {FOOTER_HEIGHT, ROUTES} from "../utils/constants";
 import {hexToRgba} from "../utils/functions";
 
 
@@ -37,83 +31,73 @@ const theme = createMuiTheme({
     }
 });
 
-@withStyles(theme => {
-    const spacingUnit = theme.spacing.unit;
-
+@withStyles(() => {
     return {
-        action: {
+        playback: {
+            alignItems: "center",
             display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between"
-        },
-        content: {
             flex: 1,
-            padding: `${spacingUnit * 2}px`
+            flexDirection: "column",
+            justifyContent: "center"
         },
-        footer: {
-            backgroundColor: hexToRgba(grey[900], 80),
-            bottom: 0,
-            position: "fixed",
+        progress: {
             width: "100%"
         },
         root: {
-            backgroundColor: hexToRgba(grey[900], 90),
+            backgroundColor: hexToRgba(grey[900], 75),
             display: "flex",
+            flexDirection: "column",
             minHeight: "100%"
         }
     };
 })
+@inject(({player, songs}) => ({player, songs}))
 export class Client extends Component {
     static get propTypes() {
         return {
-            classes: PropTypes.object.isRequired
+            classes: PropTypes.object.isRequired,
+            player: PropTypes.object.isRequired,
+            songs: PropTypes.object.isRequired
         };
     }
 
     constructor(props, context) {
         super(props, context);
-        this.footer = createRef();
-        this.state = {footerHeight: FOOTER_HEIGHT};
-        this.updateFooterSize = this.updateFooterSize.bind(this);
+
+        const {player, songs} = props;
+
+        songs
+            .getSongs({pageSize: 1})
+            .then(() => this.queueRandomSong())
+            .then(() => {
+                player.callbacks.ended = () => player.playNextSong();
+                player.callbacks.canPlay = () => this.queueRandomSong();
+            });
     }
 
-    componentDidMount() {
-        window.addEventListener("resize", this.updateFooterSize, true);
-        this.updateFooterSize();
-    }
+    queueRandomSong() {
+        const {player, songs} = this.props;
+        const page = Math.floor(Math.random() * songs.count) + 1;
 
-    componentWillUnmount() {
-        window.removeEventListener("resize", this.updateFooterSize, true);
-    }
-
-    updateFooterSize() {
-        this.setState({footerHeight: this.footer.current.clientHeight});
+        return songs
+            .getSongs({page, pageSize: 1})
+            .then(songs => songs[0])
+            .then(song => player.queueSong(song));
     }
 
     render() {
         const {classes} = this.props;
-        const {footerHeight} = this.state;
-        const pageStyle = {paddingBottom: `${footerHeight}px`};
 
         return (
             <MuiThemeProvider theme={theme}>
                 <div className={classes.root}>
                     <BackgroundImage/>
-                    <div className={classes.content} style={pageStyle}>
-                        <Switch>
-                            <Route {...ROUTES.album} component={AlbumPage}/>
-                            <Route {...ROUTES.history} component={HistoryPage}/>
-                            <Route {...ROUTES.home} component={HomePage}/>
-                            <Route {...ROUTES.queue} component={QueuePage}/>
-                            <Route component={PageNotFound}/>
-                        </Switch>
-                    </div>
-                    <div className={classes.footer} ref={this.footer}>
+                    <div className={classes.progress}>
                         <PlaybackProgress/>
-                        <div className={classes.action}>
-                            <PlaybackControls/>
-                            <Navigation/>
-                        </div>
+                    </div>
+                    <div className={classes.playback}>
+                        <PlaybackControls/>
+                        <PlaybackInformation/>
                     </div>
                 </div>
             </MuiThemeProvider>

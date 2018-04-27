@@ -1,7 +1,6 @@
 import {Provider} from "mobx-react";
 import React from "react";
 import ReactDOM from "react-dom";
-import {BrowserRouter} from "react-router-dom";
 
 import {Client} from "./components/Client";
 import {store} from "./models/store";
@@ -14,9 +13,7 @@ if (process.env.NODE_ENV !== "production") {
 
 ReactDOM.render(
     <Provider {...store}>
-        <BrowserRouter>
-            <Client/>
-        </BrowserRouter>
+        <Client/>
     </Provider>,
     document.getElementById("application")
 );

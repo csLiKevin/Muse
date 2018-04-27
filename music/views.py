@@ -37,14 +37,6 @@ class SongFilter(FilterSet):
         fields = ("album_artist", "album_name", "persistent_id",)
 
 
-class AlbumList(ListAPIView):
-    filter_backends = (DjangoFilterBackend,)
-    filter_fields = ("artist", "name")
-    pagination_class = ClassicPagination
-    queryset = AlbumModel.objects.order_by("name").all()
-    serializer_class = AlbumSerializer
-
-
 class SongList(ListAPIView):
     filter_backends = (DjangoFilterBackend,)
     filter_class = SongFilter

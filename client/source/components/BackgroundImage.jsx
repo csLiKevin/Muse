@@ -12,13 +12,13 @@ import PropTypes from "proptypes";
         zIndex: -1
     }
 }))
-@inject(({player: {currentSong}}) => ({currentSong}))
+@inject(({player}) => ({player}))
 @observer
 export class BackgroundImage extends Component {
     static get propTypes() {
         return {
             classes: PropTypes.object.isRequired,
-            currentSong: PropTypes.object.isRequired
+            player: PropTypes.object.isRequired
         };
     }
 
@@ -28,10 +28,11 @@ export class BackgroundImage extends Component {
     }
 
     render() {
-        const {classes, currentSong} = this.props;
+        const {classes, player} = this.props;
+        const {currentSong} = player;
 
         return (
-            <Fade in={currentSong.audioStatus.playing}>
+            <Fade in={Boolean(player._currentSong)}>
                 <CardMedia
                     className={classes.root}
                     image={currentSong.album.image || this.fillerPixelPath}

@@ -10,10 +10,6 @@ export class ApiClient {
             .then(json => pythonize(json, true));
     }
 
-    static getAlbums({page=1, pageSize=24, ...filters}) {
-        return ApiClient.get('/api/albums/', {page, page_size: pageSize, ...filters});
-    }
-
     static getSongs({page=1, pageSize=24, ...filters}) {
         return ApiClient.get('/api/songs/', {page, page_size: pageSize, ...filters});
     }
