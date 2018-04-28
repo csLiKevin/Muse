@@ -1,12 +1,14 @@
 import {colors, createMuiTheme, MuiThemeProvider, withStyles} from "material-ui";
 import {inject} from "mobx-react";
 import PropTypes from "proptypes";
-import React, {Component} from "react";
+import React, {Component, Fragment} from "react";
 
 import {BackgroundImage} from "./BackgroundImage";
+import {LoadingAnimation} from "./LoadingAnimation";
 import {PlaybackControls} from "./PlaybackControls";
 import {PlaybackInformation} from "./PlaybackInformation";
 import {PlaybackProgress} from "./PlaybackProgress";
+import {ElectronTitleBar} from "../electron/ElectronTitleBar";
 import {hexToRgba} from "../utils/functions";
 
 
@@ -31,26 +33,23 @@ const theme = createMuiTheme({
     }
 });
 
-@withStyles(() => {
-    return {
-        playback: {
-            alignItems: "center",
-            display: "flex",
-            flex: 1,
-            flexDirection: "column",
-            justifyContent: "center"
-        },
-        progress: {
-            width: "100%"
-        },
-        root: {
-            backgroundColor: hexToRgba(grey[900], 75),
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "100%"
-        }
-    };
-})
+@withStyles(() => ({
+    information: {
+        alignItems: "center",
+        display: "flex",
+        flex: 1
+    },
+    progress: {
+        width: "100%"
+    },
+    root: {
+        alignItems: "center",
+        backgroundColor: hexToRgba(grey[900], 75),
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100%"
+    }
+}))
 @inject(({player, songs}) => ({player, songs}))
 export class Client extends Component {
     static get propTypes() {
@@ -66,12 +65,15 @@ export class Client extends Component {
 
         const {player, songs} = props;
 
+        this.state = {loading: true};
+        this.queueRandomSong = this.queueRandomSong.bind(this);
         songs
             .getSongs({pageSize: 1})
-            .then(() => this.queueRandomSong())
+            .then(this.queueRandomSong)
             .then(() => {
-                player.callbacks.ended = () => player.playNextSong();
-                player.callbacks.canPlay = () => this.queueRandomSong();
+                player.callbacks.ended = player.playNextSong.bind(player);
+                player.callbacks.canPlay = this.queueRandomSong;
+                this.setState({loading: false});
             });
     }
 
@@ -79,26 +81,39 @@ export class Client extends Component {
         const {player, songs} = this.props;
         const page = Math.floor(Math.random() * songs.count) + 1;
 
-        return songs
-            .getSongs({page, pageSize: 1})
-            .then(songs => songs[0])
-            .then(song => player.queueSong(song));
+        return songs.getSongs({page, pageSize: 1}).then(songs => player.queueSong(songs[0]));
     }
 
     render() {
         const {classes} = this.props;
+        let content;
+
+        if (this.state.loading) {
+            content = (
+                <div className={classes.information}>
+                    <LoadingAnimation/>
+                </div>
+            );
+        } else {
+            content = (
+                <Fragment>
+                    <div className={classes.information}>
+                        <PlaybackInformation/>
+                    </div>
+                    <PlaybackControls/>
+                    <div className={classes.progress}>
+                        <PlaybackProgress/>
+                    </div>
+                </Fragment>
+            );
+        }
 
         return (
             <MuiThemeProvider theme={theme}>
                 <div className={classes.root}>
+                    <ElectronTitleBar/>
                     <BackgroundImage/>
-                    <div className={classes.progress}>
-                        <PlaybackProgress/>
-                    </div>
-                    <div className={classes.playback}>
-                        <PlaybackControls/>
-                        <PlaybackInformation/>
-                    </div>
+                    {content}
                 </div>
             </MuiThemeProvider>
         );

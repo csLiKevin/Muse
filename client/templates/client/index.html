@@ -24,6 +24,6 @@
             <script src="https://unpkg.com/react-dom@^16.3.2/umd/react-dom.production.min.js"></script>
         {% endif %}
         {# Main application bundle. #}
-        <script type="text/javascript" src="{% static 'client/js/bundle.js' %}{% if debug %}?{% now "U" %}{% endif %}"></script>
+        <script type="text/javascript" src="{% static "client/js/bundle.js" %}{% if debug %}?{% now "U" %}{% endif %}"></script>
     </body>
 </html>

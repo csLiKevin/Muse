@@ -9,7 +9,6 @@ export class Songs {
     @observable loading;
 
     constructor() {
-        this._lockLoading = false;
         this.cache = {};
         this.count = 0;
         this.loading = false;
@@ -17,16 +16,12 @@ export class Songs {
 
     @action
     disableLoading() {
-        if (!this._lockLoading) {
-            this.loading = false;
-        }
+        this.loading = false;
     }
 
     @action
     enableLoading() {
-        if (!this._lockLoading) {
-            this.loading = true;
-        }
+        this.loading = true;
     }
 
     @action

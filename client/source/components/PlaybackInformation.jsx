@@ -8,11 +8,10 @@ import React, {Component} from "react";
 
     return {
         root: {
-            paddingLeft: `${spacingUnit * 1.5}px`,
-            paddingRight: `${spacingUnit * 1.5}px`
+            padding: `${spacingUnit * 1.5}px`
         },
         text: {
-            maxWidth: "244px",
+            maxWidth: `${256 - spacingUnit * 1.5 * 2}px`,
             overflowX: "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis"

@@ -219,3 +219,15 @@ Create database entries for each audio file, album, and playlist in your iTunes 
 ```bash
 python manage.py seed_database "path/to/iTunes/iTunes Music Library.xml"
 ```
+
+## REST API
+
+### GET /api/songs/
+
+Retrieve a list songs.
+
+#### Query Parameters
+
+- album_artist
+- album_name
+- persistent_id

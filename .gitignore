@@ -4,6 +4,7 @@
 
 # Compiled Javascript files.
 client/static/client/js/bundle.js
+client/static/client/js/electron.bundle.js
 
 # Local database.
 db.sqlite3

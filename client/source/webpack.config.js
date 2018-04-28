@@ -1,7 +1,8 @@
+const cloneDeep = require("lodash.clonedeep");
 const path = require("path");
 
 
-module.exports = {
+const webConfig = {
     entry: "./index.jsx",
     externals: {
        "react": "React",
@@ -37,3 +38,12 @@ module.exports = {
         extensions: [".js", ".jsx"]
     }
 };
+
+const electronConfig = cloneDeep(webConfig);
+electronConfig.output.filename = "electron.bundle.js";
+electronConfig.target = "electron-main";
+
+// Set the fs module in the webConfig to empty after the electronConfig copied the original value.
+webConfig.node = {fs: "empty"};
+
+module.exports = [electronConfig, webConfig];

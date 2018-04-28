@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode=production",
+    "electron": "electron electron/index.js",
     "watch": "webpack --watch --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,7 +20,9 @@
     "babel-plugin-transform-es3-property-literals": "^6.22.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
+    "electron": "^2.0.0-beta.8",
     "lodash.camelcase": "^4.3.0",
+    "lodash.clonedeep": "^4.5.0",
     "lodash.snakecase": "^4.1.1",
     "material-ui": "^1.0.0-beta.43",
     "material-ui-icons": "^1.0.0-beta.36",
@@ -29,6 +32,7 @@
     "query-string": "^6.0.0",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
+    "url-join": "^4.0.0",
     "webpack": "^4.6.0",
     "webpack-cli": "^2.0.15"
   }

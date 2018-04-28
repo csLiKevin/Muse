@@ -22,6 +22,7 @@ export class Player {
             ended: () => this.playNextSong()
         };
         this.audio = new Audio();
+        this.audio.volume = 0.2;
         this.history = [];
         this.queue = [];
 
