@@ -220,6 +220,42 @@ Create database entries for each audio file, album, and playlist in your iTunes 
 python manage.py seed_database "path/to/iTunes/iTunes Music Library.xml"
 ```
 
+## Packaging
+
+Package this project as a desktop application.
+
+Setup environment variables for remote and distribution builds.
+
+```
+API_URL="https://example.com/"
+STATIC_URL="https://s3.amazonaws.com/example-bucket-name/"
+```
+
+### Local build
+
+Start an application instance using local files.
+
+```bash
+python manage.py runserver
+npm run electron-local
+```
+
+### Remote build
+
+Start an application instance that makes api requests and static file requests to remote endpoints.
+
+```bash
+npm run electron
+```
+
+### Distribution build
+
+Package a standalone application for distribution. [Output Location](media/dist)
+
+```bash
+npm run package
+```
+
 ## REST API
 
 ### GET /api/songs/

@@ -1,15 +1,15 @@
 {
   "name": "muse",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "electron/main.bundle.js",
   "scripts": {
-    "build": "webpack --mode=production",
-    "electron": "electron electron/index.js",
+    "build": "webpack --mode=production && webpack --mode=production --output-filename=electron.bundle.js --target=electron-main",
+    "electron": "webpack --mode=development --config electron/webpack.config && electron .",
+    "electron-local": "webpack --mode=production --output-filename=electron.bundle.js --target=electron-main && webpack --mode=development --config electron/webpack.config && electron .",
+    "package": "webpack --mode=production --config electron/webpack.config && node electron/packager.js",
     "watch": "webpack --watch --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
   "license": "UNLICENSED",
   "private": true,
   "devDependencies": {
@@ -21,8 +21,8 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "electron": "^2.0.0-beta.8",
+    "electron-packager": "^12.0.1",
     "lodash.camelcase": "^4.3.0",
-    "lodash.clonedeep": "^4.5.0",
     "lodash.snakecase": "^4.1.1",
     "material-ui": "^1.0.0-beta.43",
     "material-ui-icons": "^1.0.0-beta.36",

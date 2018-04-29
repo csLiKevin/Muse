@@ -1,17 +1,19 @@
-const path = require("path");
-const url = require("url");
-const urlJoin = require("url-join");
-const {app, BrowserWindow, session} = require("electron");
+import {app, BrowserWindow, session} from "electron";
+import {join} from "path";
+import {format} from "url";
+import urlJoin from "url-join";
 
 
 // Use a global reference for the window to prevent it from being garbage collected.
 let appWindow;
 
 function createAppWindow() {
-    process.env.API_URL = process.env.API_URL || "http://localhost:8000/";
-    process.env.STATIC_URL = process.env.STATIC_URL || "../../static/client/";
-    process.env.BUNDLE_PATH = urlJoin(process.env.STATIC_URL, "/js/electron.bundle.js");
-    process.env.FILLER_PIXEL_PATH = urlJoin(process.env.STATIC_URL, "/img/pixel.png");
+    // Store environment variables used by index.html.
+    process.env.ELECTRON = JSON.stringify({
+        apiUrl: process.env.API_URL,
+        bundlePath: urlJoin(process.env.STATIC_URL, "js", "electron.bundle.js"),
+        fillerPixelPath: urlJoin(process.env.STATIC_URL, "img", "pixel.png")
+    });
 
     // Spoof the Referer header.
     const filter = {urls: ["http://*/*", "https://*/*"]};
@@ -27,8 +29,8 @@ function createAppWindow() {
         width: 256
     });
     appWindow.once("ready-to-show", appWindow.show);
-    appWindow.loadURL(url.format({
-        pathname: path.join(__dirname, "index.html"),
+    appWindow.loadURL(format({
+        pathname: join(process.env.ELECTRON_DIRECTORY, "index.html"),
         protocol: "file",
         slashes: true
     }));

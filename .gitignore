@@ -3,6 +3,7 @@
 *.pyo
 
 # Compiled Javascript files.
+client/source/electron/main.bundle.js
 client/static/client/js/bundle.js
 client/static/client/js/electron.bundle.js
 
