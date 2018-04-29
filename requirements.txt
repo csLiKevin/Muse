@@ -1,4 +1,4 @@
-boto3==1.7.4
+boto3==1.7.10
 Django==2.0.4
 django-cleanup==2.1.0
 django-filter==1.1.0
