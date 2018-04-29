@@ -237,7 +237,8 @@ Start an application instance using local files.
 
 ```bash
 python manage.py runserver
-npm run electron-local
+npm run watch-electron
+npm run electron
 ```
 
 ### Remote build

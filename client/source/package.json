@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "main": "electron/main.bundle.js",
   "scripts": {
-    "build": "webpack --mode=production && webpack --mode=production --output-filename=electron.bundle.js --target=electron-main",
+    "build": "webpack --mode=production",
+    "build-electron": "webpack --mode=production --output-filename=electron.bundle.js --target=electron-main",
     "electron": "webpack --mode=development --config electron/webpack.config && electron .",
-    "electron-local": "webpack --mode=production --output-filename=electron.bundle.js --target=electron-main && webpack --mode=development --config electron/webpack.config && electron .",
     "package": "webpack --mode=production --config electron/webpack.config && node electron/packager.js",
     "watch": "webpack --watch --mode=development",
+    "watch-electron": "webpack --mode=development --output-filename=electron.bundle.js --target=electron-main --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "UNLICENSED",
