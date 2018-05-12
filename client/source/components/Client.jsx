@@ -72,7 +72,7 @@ export class Client extends Component {
             .then(this.queueRandomSong)
             .then(() => {
                 player.callbacks.ended = player.playNextSong.bind(player);
-                player.callbacks.canPlay = this.queueRandomSong;
+                player.callbacks.loadStart = this.queueRandomSong;
                 this.setState({loading: false});
             });
     }

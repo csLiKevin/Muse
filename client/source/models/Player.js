@@ -19,7 +19,8 @@ export class Player {
         this._currentSong = undefined;
         this.callbacks = {
             canPlay: () => {},
-            ended: () => this.playNextSong()
+            ended: () => this.playNextSong(),
+            loadStart: () => {}
         };
         this.audio = new Audio();
         this.audio.volume = 0.2;
@@ -44,6 +45,7 @@ export class Player {
         }));
         this.audio.addEventListener("loadstart", action(() => {
             this._audioStatus.loading = true;
+            this.callbacks.loadStart();
         }));
         this.audio.addEventListener("timeupdate", action(() => {
             this._audioStatus.currentTime = this.audio.currentTime;
