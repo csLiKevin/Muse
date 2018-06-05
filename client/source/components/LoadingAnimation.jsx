@@ -1,4 +1,4 @@
-import {CircularProgress, withStyles} from "material-ui";
+import {CircularProgress, withStyles} from "@material-ui/core";
 import PropTypes from "proptypes";
 import React, {Component} from "react";
 

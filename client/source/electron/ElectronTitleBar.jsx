@@ -1,5 +1,5 @@
-import {Button, withStyles} from "material-ui";
-import {Close} from "material-ui-icons"
+import {Button, withStyles} from "@material-ui/core";
+import {Close} from "@material-ui/icons";
 import React, {Component} from "react";
 import PropTypes from "proptypes";
 

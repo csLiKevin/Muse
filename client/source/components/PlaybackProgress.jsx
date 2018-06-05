@@ -1,4 +1,4 @@
-import {Fade, LinearProgress, withStyles} from "material-ui";
+import {Fade, LinearProgress, withStyles} from "@material-ui/core";
 import {inject, observer} from "mobx-react";
 import PropTypes from "proptypes";
 import React, {Component} from "react";

@@ -1,5 +1,5 @@
-import {IconButton} from 'material-ui';
-import {PauseCircleOutline, PlayCircleOutline, SkipNext, SkipPrevious} from "material-ui-icons";
+import {IconButton} from "@material-ui/core";
+import {PauseCircleOutline, PlayCircleOutline, SkipNext, SkipPrevious} from "@material-ui/icons";
 import {inject, observer} from "mobx-react";
 import PropTypes from "proptypes";
 import React, {Component} from "react";

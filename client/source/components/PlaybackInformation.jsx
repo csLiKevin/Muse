@@ -1,4 +1,4 @@
-import {Fade, Typography, withStyles} from 'material-ui';
+import {Fade, Typography, withStyles} from "@material-ui/core";
 import {inject, observer} from "mobx-react";
 import React, {Component} from "react";
 

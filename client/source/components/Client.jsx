@@ -1,4 +1,4 @@
-import {colors, createMuiTheme, MuiThemeProvider, withStyles} from "material-ui";
+import {colors, createMuiTheme, MuiThemeProvider, withStyles} from "@material-ui/core";
 import {inject} from "mobx-react";
 import PropTypes from "proptypes";
 import React, {Component, Fragment} from "react";
