@@ -21,8 +21,8 @@ winpty zappa undeploy dev
     AWS_SECRET_ACCESS_KEY=""
     ```
 2. Install dependencies.
-    1. Install [Python 3.6.4](https://www.python.org/downloads/).
-    2. Install [Node 8.10.0](https://nodejs.org/en/download/).
+    1. Install [Python 3.7.0](https://www.python.org/downloads/).
+    2. Install [Node 8.12.0](https://nodejs.org/en/download/).
     3. Create and activate a Python virtual environment.
     4. Install Python dependencies.
         ```bash
@@ -99,7 +99,7 @@ Make application public.
         ]
     }
     ```
-8. Update the following `zappa` settings.
+9. Update the following `zappa` settings.
     ```json
     {
        "dev": {
@@ -121,19 +121,19 @@ Make application public.
        }
     }
     ```
-9. Apply the updated settings.
+10. Apply the updated settings.
     ```bash
     zappa update dev
     ```
-10. Sync static files to the S3 bucket.
+11. Sync static files to the S3 bucket.
     ```bash
     zappa manage dev "collectstatic --noinput"
     ```
-11. Initialize the database.
+12. Initialize the database.
     ```bash
     zappa manage dev "migrate"
     ```
-12. Create an admin super user.
+13. Create an admin super user.
     ```bash
     zappa invoke --raw dev "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'password')"
     ```
