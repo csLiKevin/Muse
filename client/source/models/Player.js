@@ -23,7 +23,7 @@ export class Player {
             loadStart: () => {}
         };
         this.audio = new Audio();
-        this.audio.volume = 0.2;
+        this.audio.volume = 0.25;
         this.history = [];
         this.queue = [];
 
