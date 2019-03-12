@@ -30,6 +30,9 @@ const theme = createMuiTheme({
             primary: grey[50],
             secondary: grey[300]
         }
+    },
+    typography: {
+        useNextVariants: true
     }
 });
 

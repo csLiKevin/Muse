@@ -21,7 +21,7 @@ winpty zappa undeploy dev
     AWS_SECRET_ACCESS_KEY=""
     ```
 2. Install dependencies.
-    1. Install [Python 3.7.0](https://www.python.org/downloads/).
+    1. Install [Python 3.6.7](https://www.python.org/downloads/).
     2. Install [Node 8.12.0](https://nodejs.org/en/download/).
     3. Create and activate a Python virtual environment.
     4. Install Python dependencies.

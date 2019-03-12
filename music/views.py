@@ -29,8 +29,8 @@ class SongSerializer(ModelSerializer):
 
 
 class SongFilter(FilterSet):
-    album_artist = CharFilter(name="album__artist")
-    album_name = CharFilter(name="album__name")
+    album_artist = CharFilter(field_name="album__artist")
+    album_name = CharFilter(field_name="album__name")
 
     class Meta:
         model = SongModel

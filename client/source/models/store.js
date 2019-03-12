@@ -4,7 +4,7 @@ import {Player} from "./Player";
 import {Songs} from "./Songs";
 
 
-configure({enforceActions: true});
+configure({enforceActions: "observed"});
 
 export const store = {
     player: new Player(),

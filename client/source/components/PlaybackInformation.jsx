@@ -31,10 +31,10 @@ export class PlaybackInformation extends Component {
                     <Typography className={classes.text} variant="title">
                         {currentSong.name}
                     </Typography>
-                    <Typography className={classes.text} color="textSecondary" variant="body1">
+                    <Typography className={classes.text} color="textSecondary" variant="body2">
                         {currentSong.album.name}
                     </Typography>
-                    <Typography className={classes.text} color="textSecondary" variant="body1">
+                    <Typography className={classes.text} color="textSecondary" variant="body2">
                         {currentSong.artist}
                     </Typography>
                 </div>

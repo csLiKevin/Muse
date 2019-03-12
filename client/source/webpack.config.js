@@ -16,11 +16,16 @@ module.exports = {
                         loader: "babel-loader",
                         options: {
                             plugins: [
-                                "transform-decorators-legacy"
+                                ["@babel/plugin-proposal-decorators", { legacy: true }],
+                                ["@babel/plugin-proposal-class-properties", { loose: true }]
+                                
                             ],
                             presets: [
-                                "stage-0",
-                                "react"
+                                [
+                                    "@babel/preset-env",
+                                    { targets: { browsers: [">0.25%", "not ie 11", "not op_mini all"] } }
+                                ],
+                                "@babel/preset-react"
                             ]
                         }
                     }
