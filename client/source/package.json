@@ -22,7 +22,7 @@
     "@material-ui/core": "^3.9.2",
     "@material-ui/icons": "^3.0.2",
     "babel-loader": "^8.0.5",
-    "electron": "^4.0.8",
+    "electron": "^7.2.4",
     "electron-packager": "^13.1.1",
     "lodash.camelcase": "^4.3.0",
     "lodash.snakecase": "^4.1.1",
