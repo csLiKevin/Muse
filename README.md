@@ -21,13 +21,14 @@ winpty zappa undeploy dev
     AWS_SECRET_ACCESS_KEY=""
     ```
 2. Install dependencies.
-    1. Install [Python 3.6.7](https://www.python.org/downloads/).
+    1. Install [Python 3.8.5](https://www.python.org/downloads/).
     2. Install [Node 8.12.0](https://nodejs.org/en/download/).
     3. Create and activate a Python virtual environment.
     4. Install Python dependencies.
         ```bash
         pip install -r requirements.txt
         ```
+        On windows you may need to install [precompiled wheels](https://www.lfd.uci.edu/~gohlke/pythonlibs/) for some packages.
 3. Build web client.
     ```bash
     cd client/source
@@ -104,8 +105,8 @@ Make application public.
     {
        "dev": {
          "aws_environment_variables": {
-           "DJANGO_AWS_STORAGE_BUCKET_NAME": "s3.example.com",
            "DJANGO_ALLOWED_HOSTS": "api.example.com",
+           "DJANGO_AWS_STORAGE_BUCKET_NAME": "s3.example.com",
            "DJANGO_DATABASE_HOST": "rds.example.com",
            "DJANGO_DATABASE_NAME": "dbname",
            "DJANGO_DATABASE_PASSWORD": "dbpassword",
@@ -115,6 +116,7 @@ Make application public.
            "STAGE": "public"
          }
        },
+       "aws_region": "us-east-1",
        "vpc_config": {
          "SubnetIds": ["subnet-1", "subnet-2", "subnet-3"],
          "SecurityGroupIds": ["sg-1"]
