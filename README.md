@@ -176,11 +176,16 @@ Make application public.
     ```
 
 ## Teardown deployment
-Remove all AWS resources created by `zappa`.
 
-```bash
-zappa undeploy dev
-```
+1. Delete the custom domain associated with the API Gateway.
+2. Remove all AWS resources created by `zappa`.
+    ```bash
+    zappa undeploy dev
+    ```
+3. Delete the certificate in Certificate Manager.
+4. Delete the database in RDS.
+5. Delete the IAM user.
+6. Delete S3 bucket.
 
 ## Django management commands
 
