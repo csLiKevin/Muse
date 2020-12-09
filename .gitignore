@@ -1,26 +1,5 @@
-# Compiled Python files.
 *.pyc
 *.pyo
 
-# Transpiled Javascript files.
-client/source/electron/main.bundle.js
-client/static/client/js/bundle.js
-client/static/client/js/electron.bundle.js
-
-# Local database.
-db.sqlite3
-
-# Local media files.
-media/
-
-# Development packages.
-client/source/node_modules/
-virtualenv/
-
-# Deployment settings.
-.env_remote
-zappa_settings.json
-
-# IDE settings.
-.idea/
-.vscode/
+/.vscode/
+/virtualenv/
