@@ -1,277 +1,139 @@
 # Muse
 
-Application for hosting your iTunes library online.
+Self host your iTunes library as a web radio station.
 
-**Note for Windows users:**
-Prepend `python` and `zappa` commands with `winpty` if you need an interactive text terminal.
+## Installation
 
-```
-winpty zappa undeploy dev
-```
-
-## Setup
-
-1. Setup environment variables.
-    ```
-    PYTHONPATH="."
-    PYTHONUNBUFFERED=1
-    
-    # Replace with your credentials.
-    AWS_ACCESS_KEY_ID=""
-    AWS_SECRET_ACCESS_KEY=""
-    ```
-2. Install dependencies.
-    1. Install [Python 3.8.5](https://www.python.org/downloads/).
-    2. Install [Node 8.12.0](https://nodejs.org/en/download/).
-    3. Create and activate a Python virtual environment.
-    4. Install Python dependencies.
-        ```bash
-        pip install -r requirements.txt
+1. Launch a web server ([EC2](https://console.aws.amazon.com/ec2)).
+    1. Select `Ubuntu Server 20.04 LTS 64-bit (x86)` as the AMI.
+    2. Select an instance type with at least 2 GB of memory, such as `t2`.
+    3. Add a security group with the following rules:
+        - Inbound Rules
+            |Type |Protocol|Port Range|Source   |
+            |:-:  |:-:     |:-:       |:-:      |
+            |SSH  |TCP     |22        |YOUR IP  |
+            |HTTP |TCP     |80        |0.0.0.0/0|
+            |HTTPS|TCP     |443       |0.0.0.0/0|
+            This will allow anyone to access the server with their browser. It also allows SSH access from your IP address.
+        - Outbound Rules
+            |Type |Protocol|Port Range|Source   |
+            |:-:  |:-:     |:-:       |:-:      |
+            |HTTP |TCP     |80        |0.0.0.0/0|
+            |HTTPS|TCP     |443       |0.0.0.0/0|
+            This allows the server to make web requests during the installation process.
+    4. (Optional) Tag all newly created resources so you can identify which resources to delete for teardown.
+    5. When you launch your server it will ask you to assign a key pair to the server. Make sure you have access to the `pem` file.
+2. Install [Azuracast](https://www.azuracast.com/install/docker.html).
+    1. View the details of your server and grab the `Public IPv4 DNS` value.
+    2. SSH into your server.
         ```
-        On windows you may need to install [precompiled wheels](https://www.lfd.uci.edu/~gohlke/pythonlibs/) for some packages.
-3. Build web client.
-    ```bash
-    cd client/source
-    npm install
-    npm run build
-    cd -
+        ssh -i path/to/my.pem ubuntu@my-instance-public-dns-name
+        ```
+    3. Run the following commands:
+        ```
+        sudo su
+        mkdir -p /var/azuracast
+        cd /var/azuracast
+        curl -fsSL https://raw.githubusercontent.com/AzuraCast/AzuraCast/master/docker.sh > docker.sh
+        chmod a+x docker.sh
+        yes 'Y' | ./docker.sh setup-release
+        yes '' | ./docker.sh install
+        ```
+        **Note:** Super user access is required because resources need to be created outside of the home folder.
+3. Configure Azuracast.
+    1. Paste the `Public IPv4 DNS` in a browser to visit your Azuracast installation.
+    2. It will ask you set the login credentials of the administrator.
+    3. Create a station. `Name` is the only required field.
+    4. (Optional) Configure system settings.
+
+## (Optional) Remote storage
+
+Host media files on [remote storage](https://www.azuracast.com/extending/s3-configuration.html) instead of the server.
+
+1. Configure [S3](https://s3.console.aws.amazon.com/s3) as a storage location.
+    1. `Administration > Storage Location > + Add Storage Location`
+    2. Configuration:
+        |             |                          |
+        |---          |---                       |
+        |Path/Suffix  |/music                    |
+        |Storage Quota|                          |
+        |Access Key ID|YOUR_AWS_ACCESS_KEY_ID    |
+        |Secret Key   |YOUR_AWS_ACCESS_KEY_SECRET|
+        |Endpoint     |https://s3.amazonaws.com  |
+        |Bucket Name  |YOUR_BUCKET_NAME          |
+        |Region       |YOUR_BUCKET_REGION        |
+        |API Version  |latest                    |
+2. Configure a station to use remote storage.
+    1. `Administration > Stations > Edit > Media Storage Location`
+    2. Select newly added storage location.
+
+### Sync Music
+
+1. Create a virtual environment.
+    ```
+    python -m venv virtualenv
+    ```
+2. Activate the virtual environment.
+    ```
+    source ./virtualenv/Scripts/activate
+    ```
+3. Install dependencies.
+    ```
+    pip install -r requirements.txt
+    ```
+4. Export iTunes Library as an XML file.
+    1. Open iTunes.
+    2. `Edit > Preferences > Advanced`
+    3. Check `Share iTunes Library XML with other applications`.
+5. Run sync script:
+    ```
+    python sync.py \
+        -b AWS_S3_BUCKET_NAME \
+        -k AWS_ACCESS_KEY_ID \
+        -s AWS_SECRET_ACCESS_KEY \
+        -ilx="path/to/your/iTunes Music Library.xml"
     ```
 
-## Start local server
+## (Optional) Enable HTTPS
+1. Add a custom domain to [Route 53](https://console.aws.amazon.com/route53).
+2. Run `./docker.sh letsencrypt-create`.
+3. In your browser navigate to your custom domain with https.
+3. `Administration > System Settings`
+    - Settings Tab
+        - Change `Site Base URL` from http to https.
+        - Check `Use Web Proxy for Radio`.
+    - Security Tab
+        - Check `Always Use HTTPS`.
 
-```bash
-python manage.py migrate
-python manage.py runserver
+## Maintenance
+
+Use commands in the [Docker utility script](https://www.azuracast.com/developers/docker-sh.html).
+
+### Update Azuracast
+```
+sudo su
+cd /var/azuracast
+./docker.sh update-self
+yes "" | ./docker.sh update
 ```
 
-## Deploy
+## Development
 
-Make application public.
-
-1. Create or select an existing Amazon Virtual Private Cloud (VPC).
-2. Create a VPC endpoint for Amazon's S3 service.
-3. Create a S3 bucket.
-4. Create a RDS instance.
-    ```
-    PostgreSQL
-    Only enable options eligible for RDS Free Usage Tier
-    Public accessibility
-    ```
-5. Create deploy settings file. Provide the name of the S3 bucket created in step 3 when prompted.
-    ```bash
-    zappa init
-    ```
-6. Deploy with `zappa`. After this is completed an API Gateway url is returned.
-    ```bash
-    zappa deploy dev
-    ```
-7. Update the CORS Configuration for the S3 bucket. Use the API Gateway url from step 6 as the `AllowedOrigin` value.
-    ```xml
-    <CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-        <CORSRule>
-            <AllowedOrigin>https://api.example.com</AllowedOrigin>
-            <AllowedMethod>GET</AllowedMethod>
-            <MaxAgeSeconds>3000</MaxAgeSeconds>
-            <AllowedHeader>Authorization</AllowedHeader>
-        </CORSRule>
-    </CORSConfiguration>
-    ```
-8. Update the bucket policy for the S3 bucket. Include the API Gateway url from step 6 and bucket url in the referer list.
-    ```json
-    {
-        "Version": "2012-10-17",
-        "Id": "Http referer policy",
-        "Statement": [
-            {
-                "Sid": "Allow get requests from specific referers.",
-                "Effect": "Allow",
-                "Principal": "*",
-                "Action": "s3:GetObject",
-                "Resource": "arn:aws:s3:::your.bucket.name/*",
-                "Condition": {
-                    "StringLike": {
-                        "aws:Referer": [
-                            "https://api.example.com/*",
-                            "https://s3.amazonaws.com/your.bucket.name/*"
-                        ]
-                    }
-                }
-            }
-        ]
-    }
-    ```
-9. Update the following `zappa` settings.
-    ```json
-    {
-       "dev": {
-         "aws_environment_variables": {
-           "DJANGO_ALLOWED_HOSTS": "api.example.com",
-           "DJANGO_AWS_STORAGE_BUCKET_NAME": "s3.example.com",
-           "DJANGO_DATABASE_HOST": "rds.example.com",
-           "DJANGO_DATABASE_NAME": "dbname",
-           "DJANGO_DATABASE_PASSWORD": "dbpassword",
-           "DJANGO_DATABASE_PORT": "5432",
-           "DJANGO_DATABASE_USER": "admin",
-           "DJANGO_SECRET_KEY": "topsecret",
-           "STAGE": "public"
-         }
-       },
-       "aws_region": "us-east-1",
-       "vpc_config": {
-         "SubnetIds": ["subnet-1", "subnet-2", "subnet-3"],
-         "SecurityGroupIds": ["sg-1"]
-       }
-    }
-    ```
-10. Apply the updated settings.
-    ```bash
-    zappa update dev
-    ```
-11. Sync static files to the S3 bucket.
-    ```bash
-    zappa manage dev "collectstatic --noinput"
-    ```
-12. Initialize the database.
-    ```bash
-    zappa manage dev "migrate"
-    ```
-13. Create an admin super user.
-    ```bash
-    zappa invoke --raw dev "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'password')"
-    ```
-
-### Associate a custom domain
-1. Register a domain name.
-2. Create a hosted zone with Route 53. A nameserver (NS) and start of authority (SOA) record set will be automatically created for you.
-3. Go to your domain registrar and add the list of values in your Route 53 nameserver record set as the Custom DNS nameservers for your domain.
-4. Request a digital certificate from Amazon's Certificate Manager. Add the naked domain as the domain name.
-5. Add the digital certificate's ARN and naked domain to your deploy settings file. Add the naked domain to the list of allowed hosts.
-    ```json
-    {
-       "dev": {
-         "aws_environment_variables": {
-           "DJANGO_ALLOWED_HOSTS": "example.com,api.example.com"
-         },
-         "certificate_arn": "arn:aws:acm:us-east-1:123:certificate/123",
-         "domain": "example.com"
-       }
-    }
-    ```
-6. Add the certificate and domain to the API Gateway.
-    ```bash
-    zappa certify dev
-    ```
-7. Update the S3 bucket's allowed origin to your domain.
-    ```xml
-    <AllowedOrigin>https://example.com</AllowedOrigin>
-    ```
-8. Update the S3 bucket's bucket policy to include your domain as an accepted HTTP referer.
-    ```json
-    {
-        "aws:Referer": [
-            "https://example.com/*",
-            "https://s3.amazonaws.com/your.bucket.name/*"
-        ]
-    }
-    ```
-
-## Teardown deployment
-
-1. Delete the custom domain associated with the API Gateway.
-2. Remove all AWS resources created by `zappa`.
-    ```bash
-    zappa undeploy dev
-    ```
-3. Delete the certificate in Certificate Manager.
-4. Delete the database in RDS.
-5. Delete the IAM user.
-6. Delete S3 bucket.
-
-## Django management commands
-
-To run these commands locally for a remote instance of the application you have to set the same environment variables as your `zappa` settings file.
-Also make sure that your RDS instance is publicly accessible and its security group allows inbound traffic from your IP address.
-
-Some management commands rely on an iTunes library XML file. To export your iTunes library as a XML file enable the following setting in iTunes.
+Format files
 ```
-Edit
--> Preferences
--> Advanced
--> Share iTunes Library XML with other applications
+black .
 ```
 
-### clear_database
+## Troubleshooting
 
-Drop all model objects in the `music` app.
-
-```bash
-python manage.py clear_database
+Remove a SSL certificate.
 ```
-```bash
-zappa manage dev clear_database
-```
-
-### evaluate_library
-
-Check your iTunes library for compatibility.
-
-```bash
-python manage.py evaluate_library "path/to/iTunes/iTunes Music Library.xml"
+cd /var/azuracast
+docker-compose down
+docker volume rm azuracast_letsencrypt
+docker-compose up -d
 ```
 
-### seed_database
+## TODO
 
-Create database entries for each audio file, album, and playlist in your iTunes library.
-
-```bash
-python manage.py seed_database "path/to/iTunes/iTunes Music Library.xml"
-```
-
-## Packaging
-
-Package this project as a desktop application.
-
-Setup environment variables for remote and distribution builds.
-
-```
-API_URL="https://example.com/"
-STATIC_URL="https://s3.amazonaws.com/example-bucket-name/"
-```
-
-### Local build
-
-Start an application instance using local files.
-
-```bash
-python manage.py runserver
-npm run watch-electron
-npm run electron
-```
-
-### Remote build
-
-Start an application instance that makes api requests and static file requests to remote endpoints.
-
-```bash
-npm run electron
-```
-
-### Distribution build
-
-Package a standalone application for distribution. [Output Location](media/dist)
-
-```bash
-npm run package
-```
-
-## REST API
-
-### GET /api/songs/
-
-Retrieve a list songs.
-
-#### Query Parameters
-
-- album_artist
-- album_name
-- persistent_id
+- Sync playlists.

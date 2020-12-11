@@ -35,7 +35,7 @@ parser.add_argument(
     required=True,
     type=FileType("rb"),
 )
-parser.add_argument("-k", "--key", help="AWS Access Key", required=True, type=str)
+parser.add_argument("-k", "--key", help="AWS Access Key Id", required=True, type=str)
 parser.add_argument(
     "-s", "--secret", help="AWS Secret Access Key", required=True, type=str
 )
