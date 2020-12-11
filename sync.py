@@ -25,13 +25,9 @@ def get_md5(path):
     return md5_hash.hexdigest()
 
 
-def get_key(path):
-    return f"{BUCKET_PREFIX}{location.removeprefix(music_folder)}".replace("\\", "/")
-
-
 parser = ArgumentParser("Sync iTunes library to S3")
 parser.add_argument("-b", "--bucket", help="S3 Bucket", required=True, type=str)
-parser.add_argument("-d", "--dry", action="store_true", help="skip uploading to S3")
+parser.add_argument("-d", "--dry", action="store_true", help="skip changes to S3")
 parser.add_argument(
     "-ilx",
     "--itunes_library_xml",
@@ -50,7 +46,6 @@ itunes_library = load(args.itunes_library_xml)
 tracks = itunes_library["Tracks"].values()
 print(f"INFO: {len(tracks)} tracks detected.", file=stdout)
 
-
 music_folder = normalize_path(join(itunes_library["Music Folder"], "Music"))
 music_folder_paths = set()
 for directory, subdirectories, file_names in walk(music_folder):
@@ -60,8 +55,7 @@ for directory, subdirectories, file_names in walk(music_folder):
         print(f"WARN: {directory} is an empty directory.", file=stderr)
 
     for name in file_names:
-        location = normalize_path(join(directory, name))
-        music_folder_paths.add(normalize_path(join(directory, name)).lower())
+        music_folder_paths.add(join(directory, name).lower())
 
 s3 = resource(
     "s3",
@@ -80,7 +74,7 @@ for s3_object in bucket.objects.filter(Prefix=BUCKET_PREFIX):
 
     s3_objects[key] = s3_object.e_tag.removeprefix('"').removesuffix('"')
 
-# Upload new or modified files.
+# Upload modified or new files.
 for track in tracks:
     location = normalize_path(track["Location"])
     kind = track["Kind"]
@@ -108,11 +102,11 @@ for track in tracks:
                 file=stderr,
             )
 
-    key = get_key(location)
+    # Build S3 key. Note: S3's directory separator must be /.
+    key = f"{BUCKET_PREFIX}{location.removeprefix(music_folder)}".replace("\\", "/")
 
-    if key in s3_objects:
-        e_tag = s3_objects[key]
-
+    e_tag = s3_objects.get(key)
+    if e_tag is not None:
         # Keep track of files S3 has that don't exist locally.
         del s3_objects[key]
 
@@ -123,12 +117,20 @@ for track in tracks:
     s3_object = s3.Object(args.bucket, key)
     with open(location, "rb") as stream:
         print(f"INFO: Uploading to S3 - {key}", file=stdout)
+
+        if args.dry:
+            continue
+
         content_type, _ = guess_type(key)
         s3_object.put(Body=stream, ContentType=content_type)
 
 # Delete files not found locally.
 for key in s3_objects.keys():
     print(f"INFO: Deleting from S3 - {key}", file=stdout)
+
+    if args.dry:
+        continue
+
     s3.Object(args.bucket, key).delete()
 
 # Check for files not tracked by iTunes.
