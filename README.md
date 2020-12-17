@@ -48,10 +48,10 @@ Self host your iTunes library as a web radio station.
 
 ## (Optional) Remote Storage
 
-Host media files on [remote storage](https://www.azuracast.com/extending/s3-configuration.html) instead of the server.
+Host media and backup files on [remote storage](https://www.azuracast.com/extending/s3-configuration.html) instead of the server.
 
 1. Configure [S3](https://s3.console.aws.amazon.com/s3) as a storage location.
-    1. `Administration > Storage Location > + Add Storage Location`
+    1. `Administration > Storage Location > Station Media > + Add Storage Location`
     2. Configuration:
         |             |                          |
         |---          |---                       |
@@ -63,9 +63,17 @@ Host media files on [remote storage](https://www.azuracast.com/extending/s3-conf
         |Bucket Name  |YOUR_BUCKET_NAME          |
         |Region       |YOUR_BUCKET_REGION        |
         |API Version  |latest                    |
+    3. `Administration > Storage Location > Backups > + Add Storage Location`
+    4. Use the same configuration as `Station Media` except change `Path/Suffix` to `/backup`.
 2. Configure a station to use remote storage.
     1. `Administration > Stations > Edit > Media Storage Location`
     2. Select newly added storage location.
+3. Configure automatic backups.
+    1. `Administration > Backups > Configure`
+    2. Check `Run Automatic Nightly Backups`.
+    3. Check `Exclude Media from Backups`.
+    4. Set `Scheduled Backup Time`.
+    5. Select newly added storage location.
 
 ### Sync Music
 
@@ -141,7 +149,7 @@ docker-compose up -d
 
 ### Running Out of Disk Space
 
-Docker containers grow overtime as you add music. If you run out of disk space Docker will encounter errors and cause your radio station to crash.
+Docker containers grow overtime as you add music. If you run out of disk space, Docker will encounter errors and cause your radio station to crash.
 
 Also `docker` commands won't execute because the system cannot create files in the `/tmp` directory.
 
