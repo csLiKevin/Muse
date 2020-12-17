@@ -46,7 +46,7 @@ Self host your iTunes library as a web radio station.
     3. Create a station. `Name` is the only required field.
     4. (Optional) Configure system settings.
 
-## (Optional) Remote storage
+## (Optional) Remote Storage
 
 Host media files on [remote storage](https://www.azuracast.com/extending/s3-configuration.html) instead of the server.
 
@@ -95,6 +95,7 @@ Host media files on [remote storage](https://www.azuracast.com/extending/s3-conf
     ```
 
 ## (Optional) Enable HTTPS
+
 1. Add a custom domain to [Route 53](https://console.aws.amazon.com/route53).
 2. Run `./docker.sh letsencrypt-create`.
 3. In your browser navigate to your custom domain with https.
@@ -110,6 +111,7 @@ Host media files on [remote storage](https://www.azuracast.com/extending/s3-conf
 Use commands in the [Docker utility script](https://www.azuracast.com/developers/docker-sh.html).
 
 ### Update Azuracast
+
 ```
 sudo su
 cd /var/azuracast
@@ -126,13 +128,84 @@ black .
 
 ## Troubleshooting
 
-Remove a SSL certificate.
+### SSL Certificate is Outdated
+
+After creating a new SSL certificate you may have to remove the old certificate for the new one to take effect.
+
 ```
 cd /var/azuracast
 docker-compose down
 docker volume rm azuracast_letsencrypt
 docker-compose up -d
 ```
+
+### Running Out of Disk Space
+
+Docker containers grow overtime as you add music. If you run out of disk space Docker will encounter errors and cause your radio station to crash.
+
+Also `docker` commands won't execute because the system cannot create files in the `/tmp` directory.
+
+View filesystem `Use%` to confirm the problem.
+
+```
+df -hT
+```
+
+Free up space with the methods below. If the problem is recurring, expand your disk size.
+
+#### Restart Containers With Detached Volumes
+
+If logs are taking up too much space, restart containers with new volumes and remove old volumes.
+
+```
+docker-compose down
+docker-compose up -d
+docker volume prune
+```
+
+#### Delete Dangling Resources
+
+Deletes resources not being used by a running container.
+
+```
+docker system prune -a --volumes
+```
+
+#### Removing a Container
+
+Last resort to free up space.
+
+Remove the container named `azuracast_web` and stop the remaining containers until you can expand the disk size.
+
+```
+docker container ls --format 'table {{.ID}}\t{{.Names}}\t{{.Size}}'
+docker rm --force id_of_azuracast_web
+docker-compose down
+```
+
+#### Expand Disk Size
+
+Modify volume size and [extend the file system](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html#extend-file-system). Specific instructions differ based on operating system and file systems. Example instructions below.
+
+1. View the details of your server. In the storage tab select the volume you want to expand.
+2. `Actions > Modify Volume > Increase Size > Modify`
+3. SSH into your server.
+4. Check if the volume size has increased.
+    ```
+    lsblk
+    ```
+5. Extend partition.
+    ```
+    growpart /dev/xvdf 1
+    ```
+6. Extend file system.
+    ```
+    resize2fs /dev/xvda1
+    ```
+7. File system size should now be reflected.
+    ```
+    df -hT
+    ```
 
 ## TODO
 
