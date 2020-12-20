@@ -1,5 +1,7 @@
 # Muse
 
+https://muse.kevinli.us · https://csLiKevin.github.io/Muse
+
 Self host your iTunes library as a web radio station.
 
 ## Installation
