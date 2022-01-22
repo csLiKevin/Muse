@@ -8,9 +8,17 @@ Self host your iTunes library as a web radio station.
 
 ### Launch a web server ([EC2](https://console.aws.amazon.com/ec2)).
 
-1. Select `Ubuntu Server 20.04 LTS 64-bit (x86)` as the AMI.
-2. Select an instance type with at least 2 GB of memory, such as `t3a.small`.
-3. Add a security group with the following rules:
+1. Select `Ubuntu Server 20.04 LTS 64-bit (Arm)` as the AMI.
+2. Select an instance type with at least 2 GB of memory, such as `t4g.small`.
+3. (Optional) When configuring instance details, uncheck `Unlimited` in credit specification to prevent a surge in activity from increasing your monthly bill.
+4. Edit the Storage root volume settings:
+
+    |           |                         |
+    |:-:        |:-:                      |
+    |Size       |>=16GiB                  |
+    |Volume Type|General Purpose SSD (gp3)|
+5. (Optional) Tag all newly created resources so you can identify which resources to delete for teardown.
+6. Add a security group with the following rules:
     
     **Inbound Rules**
 
@@ -30,18 +38,17 @@ Self host your iTunes library as a web radio station.
     |HTTPS|TCP     |443       |0.0.0.0/0|
 
     This allows the server to make web requests during the installation process.
-4. (Optional) Tag all newly created resources so you can identify which resources to delete for teardown.
-5. When you launch your server it will ask you to assign a key pair to the server. Make sure you have access to the `pem` file.
+7. When you launch your server it will ask you to assign a key pair to the server. Make sure you have access to the `pem` file.
 
 ### Install [Azuracast](https://www.azuracast.com/install/docker.html).
 
 1. View the details of your server and grab the `Public IPv4 DNS` value.
 2. SSH into your server.
-    ```
+    ```bash
     ssh -i path/to/my.pem ubuntu@my-instance-public-dns-name
     ```
 3. Run the following commands:
-    ```
+    ```bash
     sudo su
     mkdir -p /var/azuracast
     cd /var/azuracast
@@ -78,8 +85,12 @@ Host media and backup files on [remote storage](https://www.azuracast.com/extend
     |Bucket Name  |YOUR_BUCKET_NAME          |
     |Region       |YOUR_BUCKET_REGION        |
     |API Version  |latest                    |
-3. `Administration > Storage Location > Backups > + Add Storage Location`
-4. Use the same configuration as `Station Media` except change `Path/Suffix` to `/backup`.
+3. `Administration > Storage Location > Station Recordings > + Add Storage Location`
+4. Use the same configuration as `Station Media` except change `Path/Suffix` to `/recordings`.
+5. `Administration > Storage Location > Station Podcasts > + Add Storage Location`
+6. Use the same configuration as `Station Media` except change `Path/Suffix` to `/podcasts`.
+7. `Administration > Storage Location > Backups > + Add Storage Location`
+8. Use the same configuration as `Station Media` except change `Path/Suffix` to `/backup`.
 
 ### Configure a station to use remote storage.
 
@@ -97,15 +108,15 @@ Host media and backup files on [remote storage](https://www.azuracast.com/extend
 ### Sync Music
 
 1. Create a virtual environment.
-    ```
+    ```bash
     python -m venv virtualenv
     ```
 2. Activate the virtual environment.
-    ```
+    ```bash
     source ./virtualenv/Scripts/activate
     ```
 3. Install dependencies.
-    ```
+    ```bash
     pip install -r requirements.txt
     ```
 4. Export iTunes Library as an XML file.
@@ -113,7 +124,7 @@ Host media and backup files on [remote storage](https://www.azuracast.com/extend
     2. `Edit > Preferences > Advanced`
     3. Check `Share iTunes Library XML with other applications`.
 5. Run sync script:
-    ```
+    ```bash
     python sync.py \
         -b AWS_S3_BUCKET_NAME \
         -k AWS_ACCESS_KEY_ID \
@@ -139,7 +150,7 @@ Use commands in the [Docker utility script](https://www.azuracast.com/developers
 
 ### Update Azuracast
 
-```
+```bash
 sudo su
 cd /var/azuracast
 ./docker.sh update-self
@@ -149,7 +160,7 @@ yes "" | ./docker.sh update
 ## Development
 
 Format files
-```
+```bash
 black .
 ```
 
@@ -159,7 +170,7 @@ black .
 
 After creating a new SSL certificate you may have to remove the old certificate for the new one to take effect.
 
-```
+```bash
 cd /var/azuracast
 docker-compose down
 docker volume rm azuracast_letsencrypt
@@ -174,7 +185,7 @@ Also `docker` commands won't execute because the system cannot create files in t
 
 View filesystem `Use%` to confirm the problem.
 
-```
+```bash
 df -hT
 ```
 
@@ -184,7 +195,7 @@ Free up space with the methods below. If the problem is recurring, expand your d
 
 If logs are taking up too much space, restart containers with new volumes and remove old volumes.
 
-```
+```bash
 docker-compose down
 docker-compose up -d
 docker volume prune
@@ -194,7 +205,7 @@ docker volume prune
 
 Deletes resources not being used by a running container.
 
-```
+```bash
 docker system prune -a --volumes
 ```
 
@@ -204,7 +215,7 @@ Last resort to free up space.
 
 Remove the container named `azuracast_web` and stop the remaining containers until you can expand the disk size.
 
-```
+```bash
 docker container ls --format 'table {{.ID}}\t{{.Names}}\t{{.Size}}'
 docker rm --force id_of_azuracast_web
 docker-compose down
@@ -218,21 +229,25 @@ Modify volume size and [extend the file system](https://docs.aws.amazon.com/AWSE
 2. `Actions > Modify Volume > Increase Size > Modify`
 3. SSH into your server.
 4. Check if the volume size has increased.
-    ```
+    ```bash
     lsblk
     ```
 5. Extend partition.
-    ```
+    ```bash
     growpart /dev/xvdf 1
     ```
 6. Extend file system.
-    ```
+    ```bash
     resize2fs /dev/xvda1
     ```
 7. File system size should now be reflected.
-    ```
+    ```bash
     df -hT
     ```
+
+### Unable to Read Files in S3
+
+If your server is suddenly unable to read files from S3, your server clock could be out of sync. If there is too much of a difference between a server's time and the actual time, AWS will reject the request. Overconsumption of resources can cause the server's clock to be out of sync over time. Rebooting the server will fix the issue. 
 
 ## TODO
 
