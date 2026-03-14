@@ -249,6 +249,19 @@ Modify volume size and [extend the file system](https://docs.aws.amazon.com/AWSE
 
 If your server is suddenly unable to read files from S3, your server clock could be out of sync. If there is too much of a difference between a server's time and the actual time, AWS will reject the request. Overconsumption of resources can cause the server's clock to be out of sync over time. Rebooting the server will fix the issue. 
 
+### Server Becomes Unresponsive
+
+The cause is unknown; currently testing if adding additional memory via a swap file helps.
+
+```bash
+fallocate -l 1G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+```
+
+
 ## TODO
 
 - Sync playlists.
